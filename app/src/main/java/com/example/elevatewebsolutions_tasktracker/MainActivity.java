@@ -1,5 +1,7 @@
 package com.example.elevatewebsolutions_tasktracker;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,6 +11,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static Intent mainActivityIntentFactory(Context applicationContext, int id) {
+        return null;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

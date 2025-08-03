@@ -20,15 +20,15 @@ public interface UserDAO {
     @Delete
     void delete(User user);
 
-    @Query("SELECT * FROM " + GymLogDatabase.USER_TABLE + " ORDER BY username")
+    @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " ORDER BY username")
     LiveData<List<User>> getAllUsers();
 
-    @Query("DELETE FROM " + GymLogDatabase.USER_TABLE)
+    @Query("DELETE FROM " +TaskManagerDatabase.USER_TABLE)
     void deleteAll();
 
-    @Query("SELECT * FROM " + GymLogDatabase.USER_TABLE + " WHERE username == :username")
+    @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " WHERE username == :username")
     LiveData<User> getUserByUsername(String username);
 
-    @Query("SELECT * FROM " + GymLogDatabase.USER_TABLE + " WHERE id == :userId")
+    @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " WHERE id == :userId")
     LiveData<User> getUserByUserId(int userId);
 }
