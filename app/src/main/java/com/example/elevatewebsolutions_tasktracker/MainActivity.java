@@ -10,7 +10,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
+import com.example.elevatewebsolutions_tasktracker.database.entities.User;
+import com.example.elevatewebsolutions_tasktracker.databinding.ActivityMainBinding;
+
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "TASK_MANAGER";
 
     public static Intent mainActivityIntentFactory(Context applicationContext, int id) {
         return null;
@@ -27,4 +32,5 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+
 }
