@@ -1,13 +1,21 @@
 package com.example.elevatewebsolutions_tasktracker.database;
 
 import android.content.Context;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.elevatewebsolutions_tasktracker.MainActivity;
 import com.example.elevatewebsolutions_tasktracker.database.entities.User;
 import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 // import com.example.elevatewebsolutions_tasktracker.database.entities.Comment;
 
 // TODO: Add Comment entity when implemented
@@ -31,6 +39,9 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
     // TODO: Add CommentDAO when Comment entity is implemented
     // public abstract CommentDAO commentDAO();
 
+    //Number of threads repository will run on
+    private static final int NUMBER_OF_THREADS = 4;
+    static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     /**
      * Singleton pattern implementation for database access
      * @param context Application context
@@ -52,4 +63,26 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
+
+    /**
+     * Adds Default values to the database in order to test functionality
+     * Adds an admin, adds a user, and adds a couple of tasks
+     */
+    private static final RoomDatabase.Callback addDefaultValues = new RoomDatabase.Callback() {
+        @Override
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+            super.onCreate(db);
+            Log.i(MainActivity.TAG, "Database CREATED!");
+            databaseWriteExecutor.execute(() -> {
+                UserDAO dao = INSTANCE.userDAO();
+                dao.deleteAll();
+                User admin = new User("admin1", "admin1", "admin");
+                admin.setAdmin(true);
+                dao.insert(admin);
+                User testuser1 = new User("testuser1", "testuser1", "user");
+                dao.insert(testuser1);
+                //TODO: add test tasks
+            });
+        }
+    };
 }

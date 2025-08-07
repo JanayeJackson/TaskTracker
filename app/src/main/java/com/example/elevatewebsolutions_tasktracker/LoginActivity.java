@@ -3,15 +3,10 @@ package com.example.elevatewebsolutions_tasktracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.UserHandle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.LiveData;
 
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
@@ -40,38 +35,48 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Checks to make sure entered username and password match an entry in the database
+     * If no match is found message is displayed indicating an unsuccessful login attempt
      *
      */
     private void verifyUser(){
-        String username = binding.userNameLoginEditText.getText().toString();
+        String username = binding.userNameLoginEditText.getText().toString(); //gets username
 
-        if(username.isEmpty()) {
-            toastMaker("usernmame should not be blank");
+        if(username.isEmpty()) { //ensure username is not blank
+            toastMaker("username should not be blank");
             return;
         }
 
-        LiveData<User> userObserver = repository.getUserByUserName(username);
+        LiveData<User> userObserver = repository.getUserByUserName(username); //gets user object
         userObserver.observe(this, user -> {
-            if(user != null){
-                String password = binding.passwordLoginEditText.getText().toString();
-                if(password.equals(user.getPassword())){
+            if(user != null){ //checks if valid user
+                String password = binding.passwordLoginEditText.getText().toString(); //gets password
+                if(password.equals(user.getPassword())){ //if password matches, user is successfully logged in
                     startActivity(MainActivity.mainActivityIntentFactory(getApplicationContext(), user.getId()));
-                }else{
+                }else{ //else error message is displayed
                     toastMaker("Invalid Username and/or Password");
                     binding.passwordLoginEditText.setSelection(0);
                 }
-            }else {
+            }else { //if no user is found error message is displayed
                 toastMaker("Invalid Username and/or Password");
                 binding.userNameLoginEditText.setSelection(0);
             }
         });
     }
 
+    /**
+     * Displays a message
+     * @param message to be displayed
+     */
     private void toastMaker(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Creates intent of LoginActivityy
+     * @param context of current tactician running
+     * @return Intent of LoginActivity
+     */
     static Intent loginIntentFactory(Context context) {
         return new Intent(context, LoginActivity.class);
     }
