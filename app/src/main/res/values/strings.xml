@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">ElevateWebSolutions_TaskTracker</string>
-    <string name="login_welcome">Welcome to the GymLog.\nPlease Sign in</string>
-    <string name="username">username</string>
-    <string name="password">password</string>
-    <string name="login">Login!</string>
+    <string name="app_name">TaskTracker</string>
+    <string name="login_welcome">Welcome to TaskTracker</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
 </resources>
