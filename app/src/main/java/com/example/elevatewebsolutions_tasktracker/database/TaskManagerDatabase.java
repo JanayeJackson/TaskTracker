@@ -7,19 +7,18 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.elevatewebsolutions_tasktracker.MainActivity;
 import com.example.elevatewebsolutions_tasktracker.database.entities.User;
 import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-// import com.example.elevatewebsolutions_tasktracker.database.entities.Comment;
 
 // TODO: Add Comment entity when implemented
-@Database(entities = {User.class, Task.class}, version = 1, exportSchema = false)
+@Database(entities = {User.class, Task.class}, version = 2, exportSchema = false)
 public abstract class TaskManagerDatabase extends RoomDatabase {
 
     // Table names
@@ -42,6 +41,20 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
     //Number of threads repository will run on
     private static final int NUMBER_OF_THREADS = 4;
     static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+
+    // Migration from version 1 to 2 (adds authentication fields)
+    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            // Add new columns for authentication
+            database.execSQL("ALTER TABLE " + USER_TABLE + " ADD COLUMN passwordSalt TEXT");
+            database.execSQL("ALTER TABLE " + USER_TABLE + " ADD COLUMN createdTimestamp INTEGER NOT NULL DEFAULT 0");
+
+            // Update existing records with current timestamp
+            database.execSQL("UPDATE " + USER_TABLE + " SET createdTimestamp = " + System.currentTimeMillis());
+        }
+    };
+
     /**
      * Singleton pattern implementation for database access
      * @param context Application context
@@ -56,7 +69,8 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
                             TaskManagerDatabase.class,
                             DATABASE_NAME
                     )
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_1_2)
+                    .addCallback(addDefaultValues)
                     .build();
                 }
             }
@@ -76,8 +90,7 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
             databaseWriteExecutor.execute(() -> {
                 UserDAO dao = INSTANCE.userDAO();
                 dao.deleteAll();
-                User admin = new User("admin1", "admin1", "admin");
-                admin.setAdmin(true);
+                User admin = new User("admin1", "admin1", "admin", true);
                 dao.insert(admin);
                 User testuser1 = new User("testuser1", "testuser1", "user");
                 dao.insert(testuser1);
