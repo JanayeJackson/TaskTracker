@@ -1,6 +1,7 @@
 package com.example.elevatewebsolutions_tasktracker.database.entities;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerDatabase;
@@ -29,7 +30,8 @@ public class User {
         this.createdTimestamp = System.currentTimeMillis();
     }
 
-    // Constructor with admin role
+    // Constructor with admin role - ignored by Room
+    @Ignore
     public User(String username, String password, String title, boolean isAdmin) {
         this.username = username;
         this.password = password; // Will be hashed by PasswordUtils before saving
