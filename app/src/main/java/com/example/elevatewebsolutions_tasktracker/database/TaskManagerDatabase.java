@@ -7,19 +7,28 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.elevatewebsolutions_tasktracker.MainActivity;
 import com.example.elevatewebsolutions_tasktracker.database.entities.User;
 import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-// import com.example.elevatewebsolutions_tasktracker.database.entities.Comment;
+
+//Admin Account:
+//Username: admin
+//Password: admin123
+
+//Regular User Account:
+//Username: user
+//Password: user123
+
+
 
 // TODO: Add Comment entity when implemented
-@Database(entities = {User.class, Task.class}, version = 1, exportSchema = false)
+@Database(entities = {User.class, Task.class}, version = 4, exportSchema = false)
 public abstract class TaskManagerDatabase extends RoomDatabase {
 
     // Table names
@@ -41,7 +50,30 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
 
     //Number of threads repository will run on
     private static final int NUMBER_OF_THREADS = 4;
-    static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+
+    // Migration from version 1 to 2 (adds authentication fields)
+    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            // Add new columns for authentication
+            database.execSQL("ALTER TABLE " + USER_TABLE + " ADD COLUMN passwordSalt TEXT");
+            database.execSQL("ALTER TABLE " + USER_TABLE + " ADD COLUMN createdTimestamp INTEGER NOT NULL DEFAULT 0");
+
+            // Update existing records with current timestamp
+            database.execSQL("UPDATE " + USER_TABLE + " SET createdTimestamp = " + System.currentTimeMillis());
+        }
+    };
+
+    // Migration from version 3 to 4 (adds index on assignedUserId)
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            // Add index on assignedUserId for better foreign key performance
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_task_table_assignedUserId` ON `" + TASK_TABLE + "` (`assignedUserId`)");
+        }
+    };
+
     /**
      * Singleton pattern implementation for database access
      * @param context Application context
@@ -56,7 +88,9 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
                             TaskManagerDatabase.class,
                             DATABASE_NAME
                     )
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_3_4)
+                    .fallbackToDestructiveMigration() // Allow destructive migration for version changes
+                    .addCallback(addDefaultValues)
                     .build();
                 }
             }
@@ -73,16 +107,45 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
             Log.i(MainActivity.TAG, "Database CREATED!");
-            databaseWriteExecutor.execute(() -> {
+            createDefaultUsersSync();
+        }
+
+        @Override
+        public void onOpen(@NonNull SupportSQLiteDatabase db) {
+            super.onOpen(db);
+            Log.i(MainActivity.TAG, "Database OPENED!");
+            // Ensure default users exist every time database opens
+            createDefaultUsersSync();
+        }
+
+        private void createDefaultUsersSync() {
+            // Execute synchronously to ensure users are created before any queries
+            try {
                 UserDAO dao = INSTANCE.userDAO();
-                dao.deleteAll();
-                User admin = new User("admin1", "admin1", "admin");
-                admin.setAdmin(true);
-                dao.insert(admin);
-                User testuser1 = new User("testuser1", "testuser1", "user");
-                dao.insert(testuser1);
-                //TODO: add test tasks
-            });
+
+                // Check if admin user exists, if not create it
+                User existingAdmin = dao.getUserByUsernameSync("admin");
+                if (existingAdmin == null) {
+                    User admin = new User("admin", "admin123", "Administrator", true);
+                    dao.insert(admin);
+                    Log.i(MainActivity.TAG, "Created admin user: admin/admin123");
+                }
+
+                // Check if regular user exists, if not create it
+                User existingUser = dao.getUserByUsernameSync("user");
+                if (existingUser == null) {
+                    User testuser = new User("user", "user123", "Regular User");
+                    dao.insert(testuser);
+                    Log.i(MainActivity.TAG, "Created regular user: user/user123");
+                }
+
+                Log.i(MainActivity.TAG, "Default users verified/created:");
+                Log.i(MainActivity.TAG, "Admin - username: admin, password: admin123");
+                Log.i(MainActivity.TAG, "User - username: user, password: user123");
+
+            } catch (Exception e) {
+                Log.e(MainActivity.TAG, "Error creating default users", e);
+            }
         }
     };
 }

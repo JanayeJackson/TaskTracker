@@ -31,4 +31,8 @@ public interface UserDAO {
 
     @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " WHERE id == :userId")
     LiveData<User> getUserByUserId(int userId);
+
+    // Synchronous method for authentication (doesn't return LiveData)
+    @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " WHERE username == :username")
+    User getUserByUsernameSync(String username);
 }
