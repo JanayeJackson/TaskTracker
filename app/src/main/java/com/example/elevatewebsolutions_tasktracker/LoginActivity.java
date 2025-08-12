@@ -7,16 +7,19 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 
+import com.example.elevatewebsolutions_tasktracker.auth.models.AuthenticationResult;
+import com.example.elevatewebsolutions_tasktracker.auth.models.LoginRequest;
+import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
+import com.example.elevatewebsolutions_tasktracker.auth.validation.InputValidator;
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
-import com.example.elevatewebsolutions_tasktracker.database.entities.User;
 import com.example.elevatewebsolutions_tasktracker.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private TaskManagerRepository repository;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,43 +28,92 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         repository = TaskManagerRepository.getRepository(getApplication());
+        sessionManager = new SessionManager(this);
+
+        // Check if user is already logged in
+        if (sessionManager.isLoggedIn()) {
+            // User already logged in, go to main activity
+            navigateToMainActivity();
+            return;
+        }
 
         binding.loginButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                verifyUser();
+                authenticateUser();
             }
         });
     }
 
     /**
-     * Checks to make sure entered username and password match an entry in the database
-     * If no match is found message is displayed indicating an unsuccessful login attempt
-     *
+     * Authenticates user using the new authentication system
      */
-    private void verifyUser(){
-        String username = binding.userNameLoginEditText.getText().toString(); //gets username
+    private void authenticateUser(){
+        String username = binding.userNameLoginEditText.getText().toString().trim();
+        String password = binding.passwordLoginEditText.getText().toString();
 
-        if(username.isEmpty()) { //ensure username is not blank
-            toastMaker("username should not be blank");
+        // Validate input
+        InputValidator.ValidationResult validation = InputValidator.validateLoginRequest(username, password);
+        if (!validation.isValid()) {
+            toastMaker(validation.getFirstError());
             return;
         }
 
-        LiveData<User> userObserver = repository.getUserByUserName(username); //gets user object
-        userObserver.observe(this, user -> {
-            if(user != null){ //checks if valid user
-                String password = binding.passwordLoginEditText.getText().toString(); //gets password
-                if(password.equals(user.getPassword())){ //if password matches, user is successfully logged in
-                    startActivity(MainActivity.mainActivityIntentFactory(getApplicationContext(), user.getId()));
-                }else{ //else error message is displayed
-                    toastMaker("Invalid Username and/or Password");
-                    binding.passwordLoginEditText.setSelection(0);
-                }
-            }else { //if no user is found error message is displayed
-                toastMaker("Invalid Username and/or Password");
-                binding.userNameLoginEditText.setSelection(0);
-            }
-        });
+        // Show loading state
+        binding.loginButton.setEnabled(false);
+        binding.loginButton.setText("Logging in...");
+
+        // Create login request
+        LoginRequest loginRequest = new LoginRequest(username, password);
+
+        // Authenticate using repository
+        repository.authenticateUser(username, password)
+            .thenAccept(result -> {
+                runOnUiThread(() -> {
+                    // Reset button state
+                    binding.loginButton.setEnabled(true);
+                    binding.loginButton.setText("Login");
+
+                    if (result.isSuccess()) {
+                        // Authentication successful
+                        sessionManager.createSession(result.getUser());
+                        toastMaker("Welcome, " + result.getUser().getUsername() + "!");
+                        navigateToMainActivity();
+                    } else {
+                        // Authentication failed
+                        toastMaker(result.getErrorMessage());
+                        clearPasswordField();
+                    }
+                });
+            })
+            .exceptionally(throwable -> {
+                runOnUiThread(() -> {
+                    // Reset button state
+                    binding.loginButton.setEnabled(true);
+                    binding.loginButton.setText("Login");
+
+                    toastMaker("Login failed: " + throwable.getMessage());
+                    clearPasswordField();
+                });
+                return null;
+            });
+    }
+
+    /**
+     * Navigate to MainActivity
+     */
+    private void navigateToMainActivity() {
+        Intent mainIntent = MainActivity.mainActivityIntentFactory(this, sessionManager.getCurrentUserId());
+        startActivity(mainIntent);
+        finish(); // Close login activity
+    }
+
+    /**
+     * Clear password field for security
+     */
+    private void clearPasswordField() {
+        binding.passwordLoginEditText.setText("");
+        binding.passwordLoginEditText.requestFocus();
     }
 
     /**
@@ -73,8 +125,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Creates intent of LoginActivityy
-     * @param context of current tactician running
+     * Creates intent of LoginActivity
+     * @param context of current application running
      * @return Intent of LoginActivity
      */
     static Intent loginIntentFactory(Context context) {
