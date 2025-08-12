@@ -2,6 +2,7 @@ package com.example.elevatewebsolutions_tasktracker.database.entities;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerDatabase;
@@ -12,7 +13,8 @@ import java.util.Objects;
         foreignKeys = @ForeignKey(entity = User.class,
                 parentColumns = "id",
                 childColumns = "assignedUserId",
-                onDelete = ForeignKey.CASCADE))
+                onDelete = ForeignKey.CASCADE),
+        indices = {@Index(value = "assignedUserId")})
 public class Task {
 
     @PrimaryKey(autoGenerate = true)

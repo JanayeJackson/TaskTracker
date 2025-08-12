@@ -12,6 +12,7 @@ import com.example.elevatewebsolutions_tasktracker.auth.models.AuthenticationRes
 import com.example.elevatewebsolutions_tasktracker.auth.models.LoginRequest;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.auth.validation.InputValidator;
+import com.example.elevatewebsolutions_tasktracker.database.TaskManagerDatabase;
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
 import com.example.elevatewebsolutions_tasktracker.databinding.ActivityLoginBinding;
 
@@ -27,8 +28,16 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Initialize repository and database early to ensure dummy users are created
         repository = TaskManagerRepository.getRepository(getApplication());
         sessionManager = new SessionManager(this);
+
+        // Force database initialization to ensure users exist before any login attempts
+        // This is done asynchronously but will complete before user can type and click login
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            // This will trigger database creation and user setup if needed
+            repository.getUserByUserName("admin"); // Dummy call to initialize DB
+        });
 
         // Check if user is already logged in
         if (sessionManager.isLoggedIn()) {
