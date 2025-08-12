@@ -22,7 +22,7 @@ public class InputValidator {
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,50}$");
 
     /**
-     * basic validation result class
+     * Basic validation result class
      */
     public static class ValidationResult {
         private final boolean valid;
