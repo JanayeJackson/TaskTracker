@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
+import com.example.elevatewebsolutions_tasktracker.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "TASK_MANAGER";
@@ -23,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private TextView usernameDisplayTextView;
     private Button logoutButton;
+
+    private ActivityMainBinding binding;
 
     public static Intent mainActivityIntentFactory(Context applicationContext, int userId) {
         Intent intent = new Intent(applicationContext, MainActivity.class);
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
             String displayText = "Logged in as: " + currentSession.getUsername();
             if (currentSession.isAdmin()) {
                 displayText += " (Admin)";
+                binding.userHeader.setVisibility(View.VISIBLE);
+                binding.user1.setVisibility(View.VISIBLE);
             }
             usernameDisplayTextView.setText(displayText);
         } else {
