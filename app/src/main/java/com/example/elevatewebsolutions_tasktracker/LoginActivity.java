@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
      * @param context of current application running
      * @return Intent of LoginActivity
      */
-    static Intent loginIntentFactory(Context context) {
+    public static Intent loginIntentFactory(Context context) {
         return new Intent(context, LoginActivity.class);
     }
 }

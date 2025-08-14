@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Light">
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
