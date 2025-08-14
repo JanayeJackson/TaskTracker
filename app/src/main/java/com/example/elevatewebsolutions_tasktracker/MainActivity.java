@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Initialize repository early to ensure database and users are created
         TaskManagerRepository repository = TaskManagerRepository.getRepository(getApplication());
@@ -51,15 +53,6 @@ public class MainActivity extends AppCompatActivity {
             finish(); // Close MainActivity so user can't go back
             return;
         }
-
-        // User is logged in, continue with normal flow
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         // Initialize UI components
         initializeViews();
@@ -96,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 displayText += " (Admin)";
                 binding.userHeader.setVisibility(View.VISIBLE);
                 binding.user1.setVisibility(View.VISIBLE);
+                binding.addTaskButton.setVisibility(View.VISIBLE);
             }
             usernameDisplayTextView.setText(displayText);
         } else {
