@@ -3,11 +3,16 @@ package com.example.elevatewebsolutions_tasktracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -72,6 +77,26 @@ public class MainActivity extends AppCompatActivity {
         logoutButton = findViewById(R.id.logoutButton);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_menu, menu);
+        return true;
+    }
+
+   @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.MenuItem);
+        UserSession currentSession = sessionManager.getCurrentSession();
+        if(currentSession == null){
+            return false; // No session, don't show menu item
+        }
+        item.setVisible(currentSession.isAdmin());
+        item.setTitle(currentSession.getUsername());
+
+        return true;
+    }
+
     private void setupLogoutButton() {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.addTaskButton.setVisibility(View.VISIBLE);
             }
             usernameDisplayTextView.setText(displayText);
+            invalidateOptionsMenu();
         } else {
             usernameDisplayTextView.setText("Not logged in");
         }
@@ -125,5 +151,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
+
+
 
 }
