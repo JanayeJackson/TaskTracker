@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -85,7 +86,17 @@ public class TaskDAOTest {
 
     @Test
     public void testDeleteAllTasks() {
-        //TODO: Implement testDeleteAllTasks
+        Task task = new Task("Test Task", "This is a test task", "open", user.getId());
+        Task task1 = new Task("Test Task 1", "This is another test task", "open", user.getId());
+        Task task2 = new Task("Test Task 2", "This is yet another test task", "open", user.getId());
+        databaseWriteExecutor.execute(() -> {
+            taskDao.insert(task);
+            taskDao.insert(task1);
+            taskDao.insert(task2);
+            Assert.assertEquals(3, Objects.requireNonNull(taskDao.getAllTasks().getValue()).size());
+            taskDao.deleteAllTasks();
+            Assert.assertNull(taskDao.getAllTasks().getValue());
+        });
     }
 
     @Test
