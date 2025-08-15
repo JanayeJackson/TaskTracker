@@ -15,7 +15,6 @@ import com.example.elevatewebsolutions_tasktracker.databinding.ActivitySettingsB
 
 public class SettingsActivity extends AppCompatActivity {
     private ActivitySettingsBinding binding;
-    private TaskManagerRepository repository;
     private SessionManager sessionManager;
 
     @Override
@@ -24,8 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Initialize repository and database
-        repository = TaskManagerRepository.getRepository(getApplication());
+        // Initialize session manager and get current user session
         sessionManager = new SessionManager(this);
         UserSession currentUserSession = sessionManager.getCurrentSession();
 
@@ -40,21 +38,24 @@ public class SettingsActivity extends AppCompatActivity {
         binding.listUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this);
+                //startActivity(intent);
             }
         });
 
         binding.addUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this);
+                //startActivity(intent);
             }
         });
 
         binding.addTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //Intent intent = AddTaskActivity.addTaskIntentFactory(SettingsActivity.this);
+                //startActivity(intent);
             }
         });
 
