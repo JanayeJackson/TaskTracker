@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
@@ -81,13 +82,21 @@ public class MainActivity extends AppCompatActivity {
    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Inflate the menu and set visibility based on user session
-        MenuItem item = menu.findItem(R.id.MenuItem);
+        MenuItem item = menu.findItem(R.id.settingsMenuItem);
         UserSession currentSession = sessionManager.getCurrentSession();
         if(currentSession == null){
             return false; // No session, don't show menu item
         }
         item.setVisible(currentSession.isAdmin());
-        item.setTitle(currentSession.getUsername());
+
+       item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+           @Override
+           public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+               Intent intent = SettingsActivity.settingsIntentFactory((getApplicationContext()));
+               startActivity(intent);
+               return false;
+           }
+       });
 
         return true;
     }
