@@ -12,4 +12,6 @@
     <string name="add_user">Add User</string>
     <string name="return_to_task">Return To Task</string>
     <string name="admin_settings">Admin Settings</string>
+    <string name="add_update_user">Add/Update User</string>
+    <string name="admin">Admin</string>
 </resources>
