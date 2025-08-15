@@ -6,21 +6,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
-import com.example.elevatewebsolutions_tasktracker.databinding.ActivityMainBinding;
 import com.example.elevatewebsolutions_tasktracker.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity {
-    public static final String TAG = "TASK_MANAGER_SETTINGS";
-
     private ActivitySettingsBinding binding;
     private TaskManagerRepository repository;
     private SessionManager sessionManager;
@@ -43,6 +36,27 @@ public class SettingsActivity extends AppCompatActivity {
             navigateToMainActivity();
             return;
         }
+
+        binding.listUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        binding.addUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        binding.addTaskButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         binding.returnToTaskButton.setOnClickListener(new View.OnClickListener(){
             @Override
