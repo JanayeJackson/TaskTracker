@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
-import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
 import com.example.elevatewebsolutions_tasktracker.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity {
