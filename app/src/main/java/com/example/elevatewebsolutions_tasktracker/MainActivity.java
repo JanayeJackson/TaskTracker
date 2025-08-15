@@ -3,7 +3,6 @@ package com.example.elevatewebsolutions_tasktracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,12 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
@@ -86,13 +81,22 @@ public class MainActivity extends AppCompatActivity {
 
    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.MenuItem);
+        // Inflate the menu and set visibility based on user session
+        MenuItem item = menu.findItem(R.id.settingsMenuItem);
         UserSession currentSession = sessionManager.getCurrentSession();
         if(currentSession == null){
             return false; // No session, don't show menu item
         }
         item.setVisible(currentSession.isAdmin());
-        item.setTitle(currentSession.getUsername());
+
+       item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+           @Override
+           public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+               Intent intent = SettingsActivity.settingsIntentFactory((getApplicationContext()));
+               startActivity(intent);
+               return false;
+           }
+       });
 
         return true;
     }
@@ -112,11 +116,13 @@ public class MainActivity extends AppCompatActivity {
             String displayText = "Logged in as: " + currentSession.getUsername();
             if (currentSession.isAdmin()) {
                 displayText += " (Admin)";
+                // Show admin-specific UI elements
                 binding.userHeader.setVisibility(View.VISIBLE);
                 binding.user1.setVisibility(View.VISIBLE);
                 binding.addTaskButton.setVisibility(View.VISIBLE);
             }
             usernameDisplayTextView.setText(displayText);
+            // Update options menu to reflect current user
             invalidateOptionsMenu();
         } else {
             usernameDisplayTextView.setText("Not logged in");
