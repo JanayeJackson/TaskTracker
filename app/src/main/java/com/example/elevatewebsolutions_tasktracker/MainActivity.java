@@ -3,11 +3,16 @@ package com.example.elevatewebsolutions_tasktracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -36,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Initialize repository early to ensure database and users are created
         TaskManagerRepository repository = TaskManagerRepository.getRepository(getApplication());
@@ -51,15 +58,6 @@ public class MainActivity extends AppCompatActivity {
             finish(); // Close MainActivity so user can't go back
             return;
         }
-
-        // User is logged in, continue with normal flow
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         // Initialize UI components
         initializeViews();
@@ -79,6 +77,26 @@ public class MainActivity extends AppCompatActivity {
         logoutButton = findViewById(R.id.logoutButton);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_menu, menu);
+        return true;
+    }
+
+   @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.MenuItem);
+        UserSession currentSession = sessionManager.getCurrentSession();
+        if(currentSession == null){
+            return false; // No session, don't show menu item
+        }
+        item.setVisible(currentSession.isAdmin());
+        item.setTitle(currentSession.getUsername());
+
+        return true;
+    }
+
     private void setupLogoutButton() {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,8 +114,10 @@ public class MainActivity extends AppCompatActivity {
                 displayText += " (Admin)";
                 binding.userHeader.setVisibility(View.VISIBLE);
                 binding.user1.setVisibility(View.VISIBLE);
+                binding.addTaskButton.setVisibility(View.VISIBLE);
             }
             usernameDisplayTextView.setText(displayText);
+            invalidateOptionsMenu();
         } else {
             usernameDisplayTextView.setText("Not logged in");
         }
@@ -131,5 +151,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
+
+
 
 }

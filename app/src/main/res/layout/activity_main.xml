@@ -44,6 +44,7 @@
         android:id="@+id/taskDisplayTableLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:padding="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logoutButton"
@@ -52,11 +53,22 @@
         <TableRow
             android:id="@+id/taskHeaderRow"
             android:layout_width="match_parent"
-            android:layout_height="224dp">
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/userHeader"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/table_cell"
+                android:padding="5dp"
+                android:text="UserID"
+                android:textSize="18sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/taskNameHeader"
-                android:layout_width="221dp"
+                android:layout_width="70dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/table_cell"
@@ -66,8 +78,8 @@
 
             <TextView
                 android:id="@+id/taskStatusHeader"
-                android:layout_width="75dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/table_cell"
                 android:padding="5dp"
@@ -76,24 +88,14 @@
 
             <TextView
                 android:id="@+id/taskDueDateHeader"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/table_cell"
                 android:padding="5dp"
                 android:text="Due Date"
                 android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/userHeader"
-                android:layout_width="65dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/table_cell"
-                android:padding="5dp"
-                android:text="UserID"
-                android:textSize="18sp"
-                android:visibility="gone" />
         </TableRow>
 
         <TableRow
@@ -102,9 +104,20 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/user1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/table_cell"
+                android:padding="5dp"
+                android:text="user1"
+                android:textSize="18sp"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/taskName1"
-                android:layout_width="185dp"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/table_cell_row"
                 android:padding="5dp"
@@ -113,8 +126,8 @@
 
             <TextView
                 android:id="@+id/taskStatus1"
-                android:layout_width="75dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/table_cell_row"
                 android:padding="5dp"
@@ -123,24 +136,13 @@
 
             <TextView
                 android:id="@+id/taskDueDate1"
-                android:layout_width="80dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/table_cell_row"
                 android:padding="5dp"
                 android:text="08/12/23"
                 android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/user1"
-                android:layout_width="65dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/table_cell"
-                android:padding="5dp"
-                android:text="user1"
-                android:textSize="18sp"
-                android:visibility="gone" />
         </TableRow>
     </TableLayout>
 

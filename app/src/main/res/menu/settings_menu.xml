@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/MenuItem"
+        android:title="@string/user"
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        />
+    <item
+        android:id="@+id/settingsMenuItem"
+        android:title="@string/settings"
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        />
+    <item
+        android:id="@+id/addTaskItem"
+        android:title="@string/add_task"
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        />
+
+
+</menu>

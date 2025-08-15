@@ -88,10 +88,10 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
                             TaskManagerDatabase.class,
                             DATABASE_NAME
                     )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_3_4)
-                    .fallbackToDestructiveMigration() // Allow destructive migration for version changes
-                    .addCallback(addDefaultValues)
-                    .build();
+                            .addMigrations(MIGRATION_1_2, MIGRATION_3_4)
+                            .fallbackToDestructiveMigration() // Allow destructive migration for version changes
+                            .addCallback(addDefaultValues)
+                            .build();
                 }
             }
         }
@@ -103,7 +103,7 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
      * Adds an admin, adds a user, and adds a couple of tasks
      */
     private static final RoomDatabase.Callback addDefaultValues = new RoomDatabase.Callback() {
-        @Override
+       @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
             Log.i(MainActivity.TAG, "Database CREATED!");
@@ -121,27 +121,29 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
         private void createDefaultUsersSync() {
             // Execute synchronously to ensure users are created before any queries
             try {
-                UserDAO dao = INSTANCE.userDAO();
+                databaseWriteExecutor.execute(() -> {
+                    UserDAO dao = INSTANCE.userDAO();
 
-                // Check if admin user exists, if not create it
-                User existingAdmin = dao.getUserByUsernameSync("admin");
-                if (existingAdmin == null) {
-                    User admin = new User("admin", "admin123", "Administrator", true);
-                    dao.insert(admin);
-                    Log.i(MainActivity.TAG, "Created admin user: admin/admin123");
-                }
+                    // Check if admin user exists, if not create it
+                    User existingAdmin = dao.getUserByUsernameSync("admin");
+                    if (existingAdmin == null) {
+                        User admin = new User("admin", "admin123", "Administrator", true);
+                        dao.insert(admin);
+                        Log.i(MainActivity.TAG, "Created admin user: admin/admin123");
+                    }
 
-                // Check if regular user exists, if not create it
-                User existingUser = dao.getUserByUsernameSync("user");
-                if (existingUser == null) {
-                    User testuser = new User("user", "user123", "Regular User");
-                    dao.insert(testuser);
-                    Log.i(MainActivity.TAG, "Created regular user: user/user123");
-                }
+                    // Check if regular user exists, if not create it
+                    User existingUser = dao.getUserByUsernameSync("user");
+                    if (existingUser == null) {
+                        User testuser = new User("user", "user123", "Regular User");
+                        dao.insert(testuser);
+                        Log.i(MainActivity.TAG, "Created regular user: user/user123");
+                    }
 
-                Log.i(MainActivity.TAG, "Default users verified/created:");
-                Log.i(MainActivity.TAG, "Admin - username: admin, password: admin123");
-                Log.i(MainActivity.TAG, "User - username: user, password: user123");
+                    Log.i(MainActivity.TAG, "Default users verified/created:");
+                    Log.i(MainActivity.TAG, "Admin - username: admin, password: admin123");
+                    Log.i(MainActivity.TAG, "User - username: user, password: user123");
+                });
 
             } catch (Exception e) {
                 Log.e(MainActivity.TAG, "Error creating default users", e);
