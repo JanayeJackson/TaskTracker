@@ -20,6 +20,22 @@ import java.util.List;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
     private List<Task> tasks = new ArrayList<>();
+    private OnTaskClickListener clickListener;
+
+    // interface for handling task item clicks
+    public interface OnTaskClickListener {
+        void onTaskClick(Task task);
+    }
+
+    // constructor to set click listener
+    public TaskAdapter(OnTaskClickListener listener) {
+        this.clickListener = listener;
+    }
+
+    // default constructor for backward compatibility
+    public TaskAdapter() {
+        this.clickListener = null;
+    }
 
     @NonNull
     @Override
@@ -54,7 +70,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
      * ViewHolder for individual task items
      * TODO: enhance with isaiah's selection handling
      */
-    static class TaskViewHolder extends RecyclerView.ViewHolder {
+    class TaskViewHolder extends RecyclerView.ViewHolder {
         private final TextView titleTextView;
         private final TextView descriptionTextView;
         private final TextView statusTextView;
@@ -71,7 +87,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             descriptionTextView.setText(task.getDescription());
             statusTextView.setText("Status: " + task.getStatus());
 
-            // TODO: add click listener for navigation to EditTaskActivity
+            // add click listener for task item interaction
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (clickListener != null) {
+                        clickListener.onTaskClick(task);
+                    }
+                }
+            });
+
+            // add visual feedback for clickable items
+            itemView.setClickable(true);
+            itemView.setFocusable(true);
         }
     }
 }

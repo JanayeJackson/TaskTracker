@@ -1,9 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ElevateWebSolutions_TaskTracker" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+    <!-- Base application theme with dark ocean blue color scheme -->
+    <style name="Theme.ElevateWebSolutions_TaskTracker" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color - Dark Ocean Blue -->
+        <item name="colorPrimary">#1565C0</item>
+        <item name="colorPrimaryVariant">#0D47A1</item>
+        <item name="colorOnPrimary">@android:color/white</item>
 
-    <style name="Theme.ElevateWebSolutions_TaskTracker" parent="Base.Theme.ElevateWebSolutions_TaskTracker" />
+        <!-- Secondary brand color - Complementary blue-green -->
+        <item name="colorSecondary">#0277BD</item>
+        <item name="colorSecondaryVariant">#01579B</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+
+        <!-- Surface colors -->
+        <item name="colorSurface">#FAFAFA</item>
+        <item name="colorOnSurface">#212121</item>
+
+        <!-- Background colors -->
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="colorOnBackground">#212121</item>
+
+        <!-- Status bar and navigation bar styling -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
 </resources>
