@@ -148,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
         // TODO: navigate to EditTaskActivity when Isaiah completes it
-        // Intent editIntent = EditTaskActivity.editTaskActivityIntentFactory(this, task.getTaskId());
-        // startActivity(editIntent);
+        Intent editIntent = EditTaskActivity.editTaskActivityIntentFactory(this, task.getTaskId());
+        startActivity(editIntent);
     }
 
     /**

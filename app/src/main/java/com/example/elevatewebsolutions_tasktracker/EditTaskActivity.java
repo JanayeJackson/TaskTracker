@@ -1,9 +1,11 @@
 package com.example.elevatewebsolutions_tasktracker;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -41,11 +43,11 @@ public class EditTaskActivity extends AppCompatActivity {
             taskId = extras.getInt("Task_Id", -1);
             if(taskId == -1) {
                 toastMaker("Unable to find task");
-                navigateToMainActivity();
+                //navigateToMainActivity();
             }
         }else{
             toastMaker("No task ID provided");
-            navigateToMainActivity();
+            //navigateToMainActivity();
         }
 
         repository = TaskManagerRepository.getRepository(getApplication());
@@ -100,52 +102,55 @@ public class EditTaskActivity extends AppCompatActivity {
         }
 
         // if validation passes, proceed to update
-        Task updatedTask = repository.getTaskByTaskID(taskId).getValue();
-        assert updatedTask != null;
-        updatedTask.setTitle(title);
-        updatedTask.setDescription(description);
-        updatedTask.setStatus(status);
-        repository.updateTask(updatedTask);
+        repository.getTaskByTaskID(taskId).observe(this, t -> {
+            t.setTitle(title);
+            t.setDescription(description);
+            t.setStatus(status);
+            repository.updateTask(t);
 
-        toastMaker("Task updated successfully");
-        navigateToMainActivity();
+            toastMaker("Task updated successfully");
+            navigateToMainActivity();
+        });
     }
 
     private void deleteTask(int taskId) {
-        Task task = repository.getTaskByTaskID(taskId).getValue();
-        //Display a confirmation dialog before deleting the user
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(EditTaskActivity.this);
-        final AlertDialog alertDialog = alertBuilder.create();
 
-        alertBuilder.setMessage("Delete task: " + task.getTitle() + "?");
+        repository.getTaskByTaskID(taskId).observe(this, t -> {
+            //Display a confirmation dialog before deleting the user
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(EditTaskActivity.this);
+            final AlertDialog alertDialog = alertBuilder.create();
 
-        alertBuilder.setPositiveButton("Delete?", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //Delete the user with the given userId
-                repository.deleteTask(task);
-                toastMaker("Task deleted successfully");
-                navigateToMainActivity();
-            }
+            alertBuilder.setMessage("Delete task: " + t.getTitle() + "?");
+
+            alertBuilder.setPositiveButton("Delete?", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    //Delete the user with the given userId
+                    repository.deleteTask(t);
+                    toastMaker("Task deleted successfully");
+                    navigateToMainActivity();
+                }
+            });
+            alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    alertDialog.dismiss();
+                }
+            });
+
+            alertBuilder.create().show();
         });
-        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertBuilder.create().show();
-
     }
 
     private void populateEditTaskView(int taskId) {
-        Task task = repository.getTaskByTaskID(taskId).getValue();
-        assert task != null;
-        binding.taskTitleEditText.setText(task.getTitle());
-        binding.taskDescriptionEditText.setText(task.getDescription());
-        binding.taskStatusSpinner.setSelection(task.getStatus().equals("To Do") ? 0 :
-                task.getStatus().equals("In Progress") ? 1 : 2);
+
+        repository.getTaskByTaskID(taskId).observe(this, t -> {
+            Log.d("DEBUG", "Observed task: " + t);
+            binding.taskTitleEditText.setText(t.getTitle());
+            binding.taskDescriptionEditText.setText(t.getDescription());
+            binding.taskStatusSpinner.setSelection(t.getStatus().equals("To Do") ? 0 :
+            t.getStatus().equals("In Progress") ? 1 : 2);
+        });
     }
 
     /**
@@ -175,5 +180,11 @@ public class EditTaskActivity extends AppCompatActivity {
 
     private void toastMaker(String message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public static Intent editTaskActivityIntentFactory(Context context, int taskId) {
+        Intent intent = new Intent(context, EditTaskActivity.class);
+        intent.putExtra("Task_Id", taskId);
+        return intent;
     }
 }
