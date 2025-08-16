@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
@@ -73,6 +74,9 @@ public class SettingsActivity extends AppCompatActivity {
         binding.addTaskButton.setVisibility(View.GONE);
         binding.settingsLogoImageView.setVisibility(View.GONE);
         binding.titleSettingsTextView.setVisibility(View.GONE);
+        RecyclerView recyclerView = new RecyclerView(SettingsActivity.this);
+        recyclerView.setVisibility(View.VISIBLE);
+
     }
 
     private void navigateToMainActivity() {
