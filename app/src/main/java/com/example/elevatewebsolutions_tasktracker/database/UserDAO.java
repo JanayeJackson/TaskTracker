@@ -6,7 +6,9 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
+import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
 import com.example.elevatewebsolutions_tasktracker.database.entities.User;
 
 import java.util.List;
@@ -16,6 +18,9 @@ public interface UserDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(User... user);
+
+    @Update
+    void update(User user);
 
     @Delete
     void delete(User user);

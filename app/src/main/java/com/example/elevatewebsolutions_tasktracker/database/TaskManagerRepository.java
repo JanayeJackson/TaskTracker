@@ -91,6 +91,26 @@ public class TaskManagerRepository {
     }
 
     /**
+     * Updates  a user in the user database
+     * @param user
+     */
+    public void updateUser(User user) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            userDao.update(user);
+        });
+    }
+
+    /**
+     * Deletes a user into the user database
+     * @param user
+     */
+    public void deleteUser(User user) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            userDao.delete(user);
+        });
+    }
+
+    /**
      * Inserts a user into the user database
      * @param user
      */
