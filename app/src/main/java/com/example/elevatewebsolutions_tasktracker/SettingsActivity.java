@@ -37,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
         binding.listUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                updateDisplay();
                 //Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this);
                 //startActivity(intent);
             }
@@ -64,6 +65,14 @@ public class SettingsActivity extends AppCompatActivity {
                 navigateToMainActivity();
             }
         });
+    }
+
+    private void updateDisplay() {
+        binding.listUserButton.setVisibility(View.GONE);
+        binding.addUserButton.setVisibility(View.GONE);
+        binding.addTaskButton.setVisibility(View.GONE);
+        binding.settingsLogoImageView.setVisibility(View.GONE);
+        binding.titleSettingsTextView.setVisibility(View.GONE);
     }
 
     private void navigateToMainActivity() {
