@@ -52,6 +52,14 @@ public class LoginActivity extends AppCompatActivity {
                 authenticateUser();
             }
         });
+
+        binding.registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = UserManagementActivity.userManagementIntentFactory(LoginActivity.this, -1);
+                startActivity(intent);
+            }
+        });
     }
 
     /**

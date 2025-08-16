@@ -7,14 +7,28 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.EntityUpsertAdapter;
 
+import com.example.elevatewebsolutions_tasktracker.adapter.TaskAdapter;
+import com.example.elevatewebsolutions_tasktracker.adapter.UserAdapter;
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
+import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
+import com.example.elevatewebsolutions_tasktracker.database.entities.User;
 import com.example.elevatewebsolutions_tasktracker.databinding.ActivitySettingsBinding;
+import com.example.elevatewebsolutions_tasktracker.viewmodel.TaskListViewModel;
+import com.example.elevatewebsolutions_tasktracker.viewmodel.UserViewModel;
 
 public class SettingsActivity extends AppCompatActivity {
     private ActivitySettingsBinding binding;
+
+    private UserViewModel userViewModel;
     private SessionManager sessionManager;
+
+    private UserAdapter userAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,24 +51,26 @@ public class SettingsActivity extends AppCompatActivity {
         binding.listUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this);
-                //startActivity(intent);
+                Intent intent = ListUserActivity.listUserIntentFactory(SettingsActivity.this);
+                startActivity(intent);
+                //updateDisplay();
+                //setupUserList();
             }
         });
 
         binding.addUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this);
-                //startActivity(intent);
+                Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this, -1);
+                startActivity(intent);
             }
         });
 
         binding.addTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = AddTaskActivity.addTaskIntentFactory(SettingsActivity.this);
-                //startActivity(intent);
+                Intent intent = AddTaskActivity.addTaskActivityIntentFactory(SettingsActivity.this);
+                startActivity(intent);
             }
         });
 
@@ -80,7 +96,9 @@ public class SettingsActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public static Intent settingsIntentFactory(Context context) {
-        return new Intent(context, SettingsActivity.class);
+    public static Intent settingsIntentFactory(Context context, int userId) {
+        Intent intent = new Intent(context, SettingsActivity.class);
+        intent.putExtra("USER_ID", userId);
+        return intent;
     }
 }

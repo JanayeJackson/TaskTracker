@@ -215,8 +215,7 @@ public class MainActivity extends AppCompatActivity {
         // for now, show task details in a toast
         // when isaiah completes edittaskactivity, we can navigate there
         String message = "Task: " + task.getTitle() + "\n" +
-                "Status: " + task.getStatus() + "\n" +
-                "Tap to edit (coming soon)";
+                "Status: " + task.getStatus();
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
         // TODO: navigate to EditTaskActivity when Isaiah completes it
@@ -274,8 +273,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (itemId == R.id.settingsMenuItem) {
             // launch settings activity - admin only
-            //Intent intent = SettingsActivity.settingsIntentFactory(this, sessionManager.getCurrentUserId());
-            //startActivity(intent);
+            Intent intent = SettingsActivity.settingsIntentFactory(this, sessionManager.getCurrentUserId());
+            startActivity(intent);
             return true;
 
         } else if (itemId == R.id.profileMenuItem) {

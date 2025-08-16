@@ -13,9 +13,11 @@
         android:theme="@style/Theme.ElevateWebSolutions_TaskTracker"
         tools:targetApi="31">
         <activity
-            android:name=".EditTaskActivity"
+            android:name=".ListUserActivity"
             android:exported="false" />
-        <!-- main activity - landing page after login -->
+        <activity
+            android:name=".EditTaskActivity"
+            android:exported="false" /> <!-- main activity - landing page after login -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
