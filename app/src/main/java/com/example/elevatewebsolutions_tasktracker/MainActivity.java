@@ -3,11 +3,18 @@ package com.example.elevatewebsolutions_tasktracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private TextView usernameDisplayTextView;
     private Button logoutButton;
+
+    // search and filter components
+    private EditText searchEditText;
+    private Spinner statusFilterSpinner;
 
     private ActivityMainBinding binding;
 
@@ -106,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
     private void initializeViews() {
         usernameDisplayTextView = findViewById(R.id.usernameDisplayTextView);
         logoutButton = findViewById(R.id.logoutButton);
+
+        // initialize search and filter components
+        searchEditText = findViewById(R.id.searchEditText);
+        statusFilterSpinner = findViewById(R.id.statusFilterSpinner);
     }
 
     private void initializeTaskList() {
@@ -125,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
         // initialize TaskListViewModel
         taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
 
+        // setup search and filter components
+        setupSearchAndFilter();
+
         // setup task list observers
         setupTaskListObservers();
 
@@ -133,6 +151,60 @@ public class MainActivity extends AppCompatActivity {
         if (currentSession != null) {
             taskListViewModel.loadTasksForUser(currentSession.getUserId());
         }
+    }
+
+    /**
+     * setup search input and status filter
+     */
+    private void setupSearchAndFilter() {
+        // setup status filter spinner
+        String[] statusOptions = {"All", "To Do", "In Progress", "Complete"};
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(
+            this,
+            android.R.layout.simple_spinner_item,
+            statusOptions
+        );
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        statusFilterSpinner.setAdapter(statusAdapter);
+
+        // listen for status filter changes
+        statusFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedStatus = statusOptions[position];
+                taskListViewModel.setStatusFilter(selectedStatus);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // default to "All"
+                taskListViewModel.setStatusFilter("All");
+            }
+        });
+
+        // listen for search text changes with debouncing
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            private Handler handler = new Handler();
+            private Runnable searchRunnable;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // cancel previous search
+                if (searchRunnable != null) {
+                    handler.removeCallbacks(searchRunnable);
+                }
+
+                // schedule new search with delay to avoid excessive filtering
+                searchRunnable = () -> taskListViewModel.setSearchQuery(s.toString());
+                handler.postDelayed(searchRunnable, 300); // 300ms delay
+            }
+        });
     }
 
     /**
