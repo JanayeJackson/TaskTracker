@@ -12,4 +12,5 @@
     <string name="add_user">Add User</string>
     <string name="return_to_task">Return To Task</string>
     <string name="admin_settings">Admin Settings</string>
+    <string name="welcome_to_tasktracker">Welcome to TaskTracker!</string>
 </resources>
