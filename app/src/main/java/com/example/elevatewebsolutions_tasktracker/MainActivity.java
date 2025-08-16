@@ -220,8 +220,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
         // TODO: navigate to EditTaskActivity when Isaiah completes it
-        // Intent editIntent = EditTaskActivity.editTaskActivityIntentFactory(this, task.getTaskId());
-        // startActivity(editIntent);
+        Intent editIntent = EditTaskActivity.editTaskActivityIntentFactory(this, task.getTaskId());
+        startActivity(editIntent);
     }
 
     /**
@@ -274,8 +274,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (itemId == R.id.settingsMenuItem) {
             // launch settings activity - admin only
-            Intent intent = SettingsActivity.settingsIntentFactory(this);
-            startActivity(intent);
+            //Intent intent = SettingsActivity.settingsIntentFactory(this, sessionManager.getCurrentUserId());
+            //startActivity(intent);
             return true;
 
         } else if (itemId == R.id.profileMenuItem) {

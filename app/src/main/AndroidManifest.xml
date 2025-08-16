@@ -12,38 +12,39 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ElevateWebSolutions_TaskTracker"
         tools:targetApi="31">
-
+        <activity
+            android:name=".EditTaskActivity"
+            android:exported="false" />
         <!-- main activity - landing page after login -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:theme="@style/Theme.ElevateWebSolutions_TaskTracker" />
-
-        <!-- login activity - app entry point -->
+            android:theme="@style/Theme.ElevateWebSolutions_TaskTracker" /> <!-- login activity - app entry point -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.ElevateWebSolutions_TaskTracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- add task activity - for creating new tasks -->
+        </activity> <!-- add task activity - for creating new tasks -->
         <activity
             android:name=".AddTaskActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.ElevateWebSolutions_TaskTracker" />
-
-        <!-- settings activity - admin and user settings -->
+            android:theme="@style/Theme.ElevateWebSolutions_TaskTracker" /> <!-- settings activity - admin and user settings -->
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.ElevateWebSolutions_TaskTracker" /> <!-- UserManagement activity - user management -->
+        <activity
+            android:name=".UserManagementActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.ElevateWebSolutions_TaskTracker" />
-
     </application>
 
 </manifest>

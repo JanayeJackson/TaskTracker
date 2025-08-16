@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class TaskManagerRepository {
@@ -29,6 +31,9 @@ public class TaskManagerRepository {
     private LiveData<List<Task>> alltasks;
 
     private static TaskManagerRepository repository;
+
+    private static final int NUMBER_OF_THREADS = 4;
+    public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     /**
      * Creates single instance of Database that can be used to update database ensuring
@@ -117,6 +122,41 @@ public class TaskManagerRepository {
     public LiveData<User> getUserByUserId(int id) {
         return userDao.getUserByUserId(id);
     }
+
+    /**
+     * Gets all users in the user database
+     * @return a LiveData object of list of Users
+     */
+    public LiveData<List<User>> getAllUsers() {
+        return userDao.getAllUsers();
+    }
+
+    /**
+     * Gets task by ID
+     * @param taskId
+     * @return a LivedData object of a task associated with the ID
+     */
+    public LiveData<Task>getTaskByTaskID(int taskId){
+        return taskDAO.getTaskById(taskId);
+    }
+
+    /**
+     * Update task in the task database
+     * @param task
+     */
+    public void updateTask(Task task) {
+        databaseWriteExecutor.execute(() -> taskDAO.update(task));
+    }
+
+    /**
+     * Deletes a task from the task database
+     * @param task
+     */
+    public void deleteTask(Task task) {
+        databaseWriteExecutor.execute(() -> taskDAO.delete(task));
+    }
+
+
 
     /**
      * Gets a list of tasks by the ID of the user that is loggedIn
