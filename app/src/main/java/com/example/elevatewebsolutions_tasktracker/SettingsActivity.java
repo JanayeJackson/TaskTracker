@@ -61,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         binding.addUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this, binding.addUserButton.getText().toString(), -1);
+                Intent intent = UserManagementActivity.userManagementIntentFactory(SettingsActivity.this, -1);
                 startActivity(intent);
             }
         });

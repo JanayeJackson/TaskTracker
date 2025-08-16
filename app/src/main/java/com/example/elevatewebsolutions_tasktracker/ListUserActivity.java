@@ -83,7 +83,7 @@ public class ListUserActivity extends AppCompatActivity {
 
     private void handleUserClick(User user) {
         // Handle user click, e.g., navigate to user management activity
-        Intent intent = UserManagementActivity.userManagementIntentFactory(this, "Update User", user.getId());
+        Intent intent = UserManagementActivity.userManagementIntentFactory(this, user.getId());
         startActivity(intent);
     }
 

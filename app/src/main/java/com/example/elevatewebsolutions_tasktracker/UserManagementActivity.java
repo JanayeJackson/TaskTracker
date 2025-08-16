@@ -28,8 +28,6 @@ public class UserManagementActivity extends AppCompatActivity {
 
     private ActivityUserManagementBinding binding;
     private TaskManagerRepository repository;
-    private String buttonTitle;
-    User tempUser;
 
     private SessionManager sessionManager;
 
@@ -44,10 +42,7 @@ public class UserManagementActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            buttonTitle = extras.getString("Button_Title", "Manage Users");
             userId = extras.getInt("User_Id", -1);
-            Log.i("UserManagementActivity", "Button Title: " + buttonTitle);
-
         }
 
         repository = TaskManagerRepository.getRepository(getApplication());
@@ -198,9 +193,8 @@ public class UserManagementActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public static Intent userManagementIntentFactory(Context context, String buttonTitle, int userId) {
+    public static Intent userManagementIntentFactory(Context context, int userId) {
         Intent intent = new Intent(context, UserManagementActivity.class);
-        intent.putExtra("Button_Title", buttonTitle);
         intent.putExtra("User_Id", userId);
         return intent;
     }
