@@ -96,8 +96,10 @@ public class UserManagementActivity extends AppCompatActivity {
         UserSession currentSession = sessionManager.getCurrentSession();
         if(currentSession != null && currentSession.isAdmin()) {
             binding.adminSwitch.setVisibility(View.VISIBLE);
+            binding.returnToSettingsButton.setVisibility(View.VISIBLE);
         } else {
             binding.adminSwitch.setVisibility(View.GONE);
+            binding.returnToSettingsButton.setVisibility(View.GONE);
         }
 
         binding.returnToSettingsButton.setOnClickListener(new View.OnClickListener() {
