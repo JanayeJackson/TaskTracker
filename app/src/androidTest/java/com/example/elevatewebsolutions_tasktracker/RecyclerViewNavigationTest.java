@@ -39,8 +39,7 @@ import java.util.concurrent.Future;
  * RecyclerView navigation tests.
  *
  * <p>Verifies that tapping a list item sends an intent to {@link EditTaskActivity}
- * and includes the expected extra. Kept simple to match the level of other tests:
- * JUnit 4, Espresso, Espresso-Intents, Room DAO seeding.</p>
+ * and includes the expected extra.
  */
 @RunWith(AndroidJUnit4.class)
 public final class RecyclerViewNavigationTest {
