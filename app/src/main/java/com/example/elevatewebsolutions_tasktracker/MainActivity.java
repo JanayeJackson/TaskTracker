@@ -202,8 +202,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (itemId == R.id.settingsMenuItem) {
             // launch settings activity - admin only
-            Intent intent = SettingsActivity.settingsIntentFactory(this, sessionManager.getCurrentUserId());
-            startActivity(intent);
+            //Intent intent = SettingsActivity.settingsIntentFactory(this, sessionManager.getCurrentUserId());
+            //startActivity(intent);
             return true;
 
         } else if (itemId == R.id.profileMenuItem) {

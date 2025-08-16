@@ -127,6 +127,33 @@ public class TaskManagerRepository {
     }
 
     /**
+     * Gets task by ID
+     * @param taskId
+     * @return a LivedData object of a task associated with the ID
+     */
+    public LiveData<Task>getTaskByTaskID(int taskId){
+        return taskDAO.getTaskById(taskId);
+    }
+
+    /**
+     * Update task in the task database
+     * @param task
+     */
+    public void updateTask(Task task) {
+        taskDAO.update(task);
+    }
+
+    /**
+     * Deletes a task from the task database
+     * @param task
+     */
+    public void deleteTask(Task task) {
+        taskDAO.delete(task);
+    }
+
+
+
+    /**
      * Gets a list of tasks by the ID of the user that is loggedIn
      * @param loggedInUserId
      * @return a LivedData object of all tasks associated with current user
