@@ -12,7 +12,10 @@ import com.example.elevatewebsolutions_tasktracker.auth.models.AuthenticationRes
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.auth.services.UserAuthenticationService;
 
-
+/**
+ * ViewModel for managing user authentication state and session management
+ * Survives configuration changes and provides LiveData for UI observation
+ */
 public class UserViewModel extends AndroidViewModel {
     private static final String TAG = "UserViewModel";
 
@@ -45,7 +48,9 @@ public class UserViewModel extends AndroidViewModel {
         return errorMessage;
     }
 
-
+    /**
+     * Attempt to log in with username and password
+     */
     public void login(String username, String password) {
         errorMessage.setValue(null);
         LoginRequest loginRequest = new LoginRequest(username, password);
@@ -72,17 +77,21 @@ public class UserViewModel extends AndroidViewModel {
                 });
     }
 
-
+    /**
+     * Log out the current user
+     */
     public void logout() {
         sessionManager.destroySession();
 
-        // update livedata
+        // Update LiveData
         currentUser.setValue(null);
         isLoggedIn.setValue(false);
         errorMessage.setValue(null);
     }
 
-
+    /**
+     * Check if there's an existing valid session on app start
+     */
     private void checkExistingSession() {
         if (sessionManager.isLoggedIn()) {
             UserSession session = sessionManager.getCurrentSession();
@@ -90,7 +99,7 @@ public class UserViewModel extends AndroidViewModel {
                 currentUser.setValue(session);
                 isLoggedIn.setValue(true);
             } else {
-                // when session is exp
+                // Session expired - already cleared by SessionManager
                 isLoggedIn.setValue(false);
             }
         } else {
@@ -98,19 +107,25 @@ public class UserViewModel extends AndroidViewModel {
         }
     }
 
-
+    /**
+     * Get current user ID (convenience method)
+     */
     public int getCurrentUserId() {
         UserSession session = currentUser.getValue();
         return session != null ? session.getUserId() : -1;
     }
 
-
+    /**
+     * Check if current user is admin (convenience method)
+     */
     public boolean isCurrentUserAdmin() {
         UserSession session = currentUser.getValue();
         return session != null && session.isAdmin();
     }
 
-
+    /**
+     * Clear error message
+     */
     public void clearError() {
         errorMessage.setValue(null);
     }
