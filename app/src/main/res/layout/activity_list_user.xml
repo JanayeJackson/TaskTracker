@@ -26,7 +26,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/returnToTaskButton"
+        android:id="@+id/returnToSettingsButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -51,5 +51,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-        app:layout_constraintBottom_toTopOf="@id/returnToTaskButton" />
+        app:layout_constraintBottom_toTopOf="@id/returnToSettingsButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>

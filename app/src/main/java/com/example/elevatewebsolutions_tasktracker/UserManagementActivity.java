@@ -29,6 +29,7 @@ public class UserManagementActivity extends AppCompatActivity {
     private ActivityUserManagementBinding binding;
     private TaskManagerRepository repository;
     private String buttonTitle;
+    User tempUser;
 
     private SessionManager sessionManager;
 
@@ -107,9 +108,7 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void deleteUser(int userId) {
-
         repository.getUserByUserId(userId).observe(this, user -> {
-
             //Display a confirmation dialog before deleting the user
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(UserManagementActivity.this);
             final AlertDialog alertDialog = alertBuilder.create();
@@ -122,7 +121,6 @@ public class UserManagementActivity extends AppCompatActivity {
                     //Delete the user with the given userId
                     repository.deleteUser(user);
                     toastMaker("User " + user.getUsername() + " deleted successfully.");
-                    navigateToSettings();
                 }
             });
             alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -181,18 +179,11 @@ public class UserManagementActivity extends AppCompatActivity {
             // Proceed with updating the user
             //toastMaker("Updating user: " + username);
             // update the user in the database
-            repository.getUserByUserId(userId).observe(this, existingUser -> {
-                if (existingUser != null) {
-                    existingUser.setUsername(username);
-                    existingUser.setPassword(password);
-                    existingUser.setTitle(title);
-                    existingUser.setAdmin(admin);
-                    repository.updateUser(existingUser);
-                    toastMaker("Updating user: " + username);
-                } else {
-                    toastMaker("User not found for update");
-                }
-            });
+            User user = new User(username, password, title, admin);
+            user.setId(userId);
+            repository.updateUser(user);
+            toastMaker("Updating user: " + username);
+            toastMaker("User not found for update");
             // Return to the settings activity after updating
             navigateToSettings();
         }

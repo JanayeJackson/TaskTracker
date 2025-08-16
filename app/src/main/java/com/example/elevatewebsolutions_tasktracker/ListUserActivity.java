@@ -42,10 +42,10 @@ public class ListUserActivity extends AppCompatActivity {
         setupUserList();
         sessionManager = new SessionManager(this);
 
-        binding.returnToTaskButton.setOnClickListener(new View.OnClickListener() {
+        binding.returnToSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = MainActivity.mainActivityIntentFactory(ListUserActivity.this, sessionManager.getCurrentUserId());
+                Intent intent = SettingsActivity.settingsIntentFactory(ListUserActivity.this, sessionManager.getCurrentUserId());
                 startActivity(intent);
             }
         });
