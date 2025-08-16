@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
            @Override
            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
-               Intent intent = SettingsActivity.settingsIntentFactory((getApplicationContext()));
+               Intent intent = SettingsActivity.settingsIntentFactory((getApplicationContext()), sessionManager.getCurrentUserId());
                startActivity(intent);
                return false;
            }

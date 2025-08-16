@@ -59,6 +59,7 @@ public class UserManagementActivity extends AppCompatActivity {
             //update the UI with user details
             binding.userNameEditText.setText(user.getUsername());
             binding.passwordEditText.setText(user.getPassword());
+            binding.confirmPasswordEditText.setText(user.getPassword());
             binding.usertitleEditText.setText(user.getTitle());
             binding.adminSwitch.setChecked(user.getAdmin());
 
@@ -93,6 +94,15 @@ public class UserManagementActivity extends AppCompatActivity {
             });
             binding.deleteUserButton.setVisibility(View.GONE);
         }
+
+        binding.returnToSettingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Return to the main activity
+                Intent intent = SettingsActivity.settingsIntentFactory(UserManagementActivity.this,  sessionManager.getCurrentUserId());
+                startActivity(intent);
+            }
+        });
     }
 
     private void deleteUser(User user) {

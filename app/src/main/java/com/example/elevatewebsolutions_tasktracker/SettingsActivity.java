@@ -80,7 +80,9 @@ public class SettingsActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public static Intent settingsIntentFactory(Context context) {
-        return new Intent(context, SettingsActivity.class);
+    public static Intent settingsIntentFactory(Context context, int userId) {
+        Intent intent = new Intent(context, SettingsActivity.class);
+        intent.putExtra("USER_ID", userId);
+        return intent;
     }
 }
