@@ -62,4 +62,36 @@ public class TaskListViewModel extends AndroidViewModel {
             loadTasksForUser(currentUserId);
         }
     }
+
+    /**
+     * Create new task for specified user
+     * basic implementation for mvp - leaving room so xavier can enhance later
+     */
+    public void createTask(String title, String description, String status, int assignedUserId) {
+        isLoading.setValue(true);
+
+        // create new task object
+        Task newTask = new Task();
+        newTask.setTitle(title);
+        newTask.setDescription(description);
+        newTask.setStatus(status);
+        newTask.setAssignedUserId(assignedUserId);
+
+        // save task using repository in background thread
+        new Thread(() -> {
+            try {
+                repository.insertTask(newTask);
+
+                // refresh task list for current user on main thread
+                if (assignedUserId == currentUserId) {
+                    loadTasksForUser(currentUserId);
+                }
+
+                isLoading.postValue(false);
+            } catch (Exception e) {
+                android.util.Log.e("TaskListViewModel", "Error creating task: " + e.getMessage());
+                isLoading.postValue(false);
+            }
+        }).start();
+    }
 }
