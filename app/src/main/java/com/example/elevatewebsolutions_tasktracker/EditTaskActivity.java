@@ -1,8 +1,11 @@
 package com.example.elevatewebsolutions_tasktracker;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -47,7 +50,9 @@ public class EditTaskActivity extends AppCompatActivity {
 
         repository = TaskManagerRepository.getRepository(getApplication());
 
+        setupStatusSpinner();
         populateEditTaskView(taskId);
+
         binding.saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,16 +106,37 @@ public class EditTaskActivity extends AppCompatActivity {
         updatedTask.setDescription(description);
         updatedTask.setStatus(status);
         repository.updateTask(updatedTask);
+
+        toastMaker("Task updated successfully");
+        navigateToMainActivity();
     }
 
     private void deleteTask(int taskId) {
-        // Logic to delete the task
         Task task = repository.getTaskByTaskID(taskId).getValue();
-        repository.deleteTask(task);
-        toastMaker("Task deleted successfully");
-        Intent intent = MainActivity.mainActivityIntentFactory(getApplicationContext(), -1);
-        startActivity(intent);
-        finish();
+        //Display a confirmation dialog before deleting the user
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(EditTaskActivity.this);
+        final AlertDialog alertDialog = alertBuilder.create();
+
+        alertBuilder.setMessage("Delete task: " + task.getTitle() + "?");
+
+        alertBuilder.setPositiveButton("Delete?", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Delete the user with the given userId
+                repository.deleteTask(task);
+                toastMaker("Task deleted successfully");
+                navigateToMainActivity();
+            }
+        });
+        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertBuilder.create().show();
+
     }
 
     private void populateEditTaskView(int taskId) {
@@ -118,6 +144,26 @@ public class EditTaskActivity extends AppCompatActivity {
         assert task != null;
         binding.taskTitleEditText.setText(task.getTitle());
         binding.taskDescriptionEditText.setText(task.getDescription());
+        binding.taskStatusSpinner.setSelection(task.getStatus().equals("To Do") ? 0 :
+                task.getStatus().equals("In Progress") ? 1 : 2);
+    }
+
+    /**
+     * setup status dropdown with basic options
+     */
+    private void setupStatusSpinner() {
+        // basic task statuses for mvp
+        String[] statuses = {"To Do", "In Progress", "Complete"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                statuses
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.taskStatusSpinner.setAdapter(adapter);
+
+        // default to "To Do" for new tasks
+        binding.taskStatusSpinner.setSelection(0);
     }
 
     private void navigateToMainActivity() {
