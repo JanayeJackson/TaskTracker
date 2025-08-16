@@ -13,18 +13,27 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.elevatewebsolutions_tasktracker.adapter.TaskAdapter;
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
 import com.example.elevatewebsolutions_tasktracker.databinding.ActivityMainBinding;
 import com.example.elevatewebsolutions_tasktracker.viewmodel.UserViewModel;
+import com.example.elevatewebsolutions_tasktracker.viewmodel.TaskListViewModel;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "TASK_MANAGER";
 
     // ViewModel for authentication state management
     private UserViewModel userViewModel;
+    private TaskListViewModel taskListViewModel;
+
+    // RecyclerView components
+    private RecyclerView tasksRecyclerView;
+    private TaskAdapter taskAdapter;
 
     // Keep existing SessionManager for backwards compatibility during transition
     private SessionManager sessionManager;
@@ -77,11 +86,52 @@ public class MainActivity extends AppCompatActivity {
             android.util.Log.i(TAG, "User logged in: " + currentSession.getUsername() +
                     " (Admin: " + currentSession.isAdmin() + ")");
         }
+
+        // Initialize RecyclerView for task list
+        initializeTaskList();
     }
 
     private void initializeViews() {
         usernameDisplayTextView = findViewById(R.id.usernameDisplayTextView);
         logoutButton = findViewById(R.id.logoutButton);
+    }
+
+    private void initializeTaskList() {
+        tasksRecyclerView = findViewById(R.id.tasksRecyclerView);
+        taskAdapter = new TaskAdapter();
+        tasksRecyclerView.setAdapter(taskAdapter);
+        tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // initialize TaskListViewModel
+        taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
+
+        // setup task list observers
+        setupTaskListObservers();
+
+        // load tasks for current user if logged in
+        UserSession currentSession = sessionManager.getCurrentSession();
+        if (currentSession != null) {
+            taskListViewModel.loadTasksForUser(currentSession.getUserId());
+        }
+    }
+
+    /**
+     * Setup LiveData observers for task list updates
+     * Connects ViewModel data changes to RecyclerView updates
+     */
+    private void setupTaskListObservers() {
+        // observe task list changes and update adapter
+        taskListViewModel.getUserTasks().observe(this, tasks -> {
+            android.util.Log.d(TAG, "Task list updated: " +
+                (tasks != null ? tasks.size() + " tasks" : "null"));
+            taskAdapter.updateTasks(tasks);
+        });
+
+        // observe loading state (for future progress indicator)
+        taskListViewModel.getIsLoading().observe(this, isLoading -> {
+            android.util.Log.d(TAG, "Task loading state: " + isLoading);
+            // TODO: finish loading state
+        });
     }
 
     @Override
