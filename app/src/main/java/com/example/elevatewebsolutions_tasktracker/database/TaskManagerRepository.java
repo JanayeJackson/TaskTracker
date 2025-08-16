@@ -119,6 +119,14 @@ public class TaskManagerRepository {
     }
 
     /**
+     * Gets all users in the user database
+     * @return a LiveData object of list of Users
+     */
+    public LiveData<List<User>> getAllUsers() {
+        return userDao.getAllUsers();
+    }
+
+    /**
      * Gets a list of tasks by the ID of the user that is loggedIn
      * @param loggedInUserId
      * @return a LivedData object of all tasks associated with current user
