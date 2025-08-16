@@ -93,6 +93,13 @@ public class UserManagementActivity extends AppCompatActivity {
             binding.deleteUserButton.setVisibility(View.GONE);
         }
 
+        UserSession currentSession = sessionManager.getCurrentSession();
+        if(currentSession != null && currentSession.isAdmin()) {
+            binding.adminSwitch.setVisibility(View.VISIBLE);
+        } else {
+            binding.adminSwitch.setVisibility(View.GONE);
+        }
+
         binding.returnToSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,11 +138,16 @@ public class UserManagementActivity extends AppCompatActivity {
 
     private void addUser() {
         // Get the input values from the EditText fields
+        boolean isAdmin;
         String username = binding.userNameEditText.getText().toString().trim();
         String title = binding.usertitleEditText.getText().toString().trim();
         String password = binding.passwordEditText.getText().toString().trim();
         String confirmPassword = binding.confirmPasswordEditText.getText().toString().trim();
-        boolean isAdmin = binding.adminSwitch.isChecked();
+        if(binding.adminSwitch.getVisibility() != View.VISIBLE) {
+            isAdmin = false;
+        }else{
+            isAdmin = binding.adminSwitch.isChecked();
+        }
 
         // Validate the input values
         if(!password.equals(confirmPassword)){
