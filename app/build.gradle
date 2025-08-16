@@ -23,8 +23,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -53,5 +53,19 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel:2.7.0"
     implementation "androidx.lifecycle:lifecycle-livedata:2.7.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0"
+
+    // testing dependencies for database tests
+    androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+    androidTestImplementation "androidx.test:core:1.5.0"
+    androidTestImplementation "androidx.test:runner:1.5.2"
+    androidTestImplementation "androidx.test:rules:1.5.0"
+
+    // unit testing dependencies for viewmodel tests
+    testImplementation "androidx.arch.core:core-testing:2.2.0"
+    testImplementation "org.mockito:mockito-core:5.1.1"
+    testImplementation "org.mockito:mockito-inline:5.1.1"
+    testImplementation "org.robolectric:robolectric:4.11.1"
+    testImplementation "androidx.test:core:1.5.0"
 
 }
