@@ -70,12 +70,8 @@ public class TaskListViewModel extends AndroidViewModel {
     public void createTask(String title, String description, String status, int assignedUserId) {
         isLoading.setValue(true);
 
-        // create new task object
-        Task newTask = new Task();
-        newTask.setTitle(title);
-        newTask.setDescription(description);
-        newTask.setStatus(status);
-        newTask.setAssignedUserId(assignedUserId);
+        // create new task object using required constructor parameters
+        Task newTask = new Task(title, description, status, assignedUserId);
 
         // save task using repository in background thread
         new Thread(() -> {
