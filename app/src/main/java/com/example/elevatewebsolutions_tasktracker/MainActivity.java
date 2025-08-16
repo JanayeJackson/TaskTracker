@@ -3,11 +3,18 @@ package com.example.elevatewebsolutions_tasktracker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private TextView usernameDisplayTextView;
     private Button logoutButton;
+
+    // search and filter components
+    private EditText searchEditText;
+    private Spinner statusFilterSpinner;
 
     private ActivityMainBinding binding;
 
@@ -106,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
     private void initializeViews() {
         usernameDisplayTextView = findViewById(R.id.usernameDisplayTextView);
         logoutButton = findViewById(R.id.logoutButton);
+
+        // initialize search and filter components
+        searchEditText = findViewById(R.id.searchEditText);
+        statusFilterSpinner = findViewById(R.id.statusFilterSpinner);
     }
 
     private void initializeTaskList() {
@@ -125,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
         // initialize TaskListViewModel
         taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
 
+        // setup search and filter components
+        setupSearchAndFilter();
+
         // setup task list observers
         setupTaskListObservers();
 
@@ -133,6 +151,60 @@ public class MainActivity extends AppCompatActivity {
         if (currentSession != null) {
             taskListViewModel.loadTasksForUser(currentSession.getUserId());
         }
+    }
+
+    /**
+     * setup search input and status filter
+     */
+    private void setupSearchAndFilter() {
+        // setup status filter spinner
+        String[] statusOptions = {"All", "To Do", "In Progress", "Complete"};
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(
+            this,
+            android.R.layout.simple_spinner_item,
+            statusOptions
+        );
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        statusFilterSpinner.setAdapter(statusAdapter);
+
+        // listen for status filter changes
+        statusFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedStatus = statusOptions[position];
+                taskListViewModel.setStatusFilter(selectedStatus);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // default to "All"
+                taskListViewModel.setStatusFilter("All");
+            }
+        });
+
+        // listen for search text changes with debouncing
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            private Handler handler = new Handler();
+            private Runnable searchRunnable;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // cancel previous search
+                if (searchRunnable != null) {
+                    handler.removeCallbacks(searchRunnable);
+                }
+
+                // schedule new search with delay to avoid excessive filtering
+                searchRunnable = () -> taskListViewModel.setSearchQuery(s.toString());
+                handler.postDelayed(searchRunnable, 300); // 300ms delay
+            }
+        });
     }
 
     /**
@@ -148,8 +220,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
         // TODO: navigate to EditTaskActivity when Isaiah completes it
-        // Intent editIntent = EditTaskActivity.editTaskActivityIntentFactory(this, task.getTaskId());
-        // startActivity(editIntent);
+        Intent editIntent = EditTaskActivity.editTaskActivityIntentFactory(this, task.getTaskId());
+        startActivity(editIntent);
     }
 
     /**
@@ -202,8 +274,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (itemId == R.id.settingsMenuItem) {
             // launch settings activity - admin only
-            Intent intent = SettingsActivity.settingsIntentFactory(this);
-            startActivity(intent);
+            //Intent intent = SettingsActivity.settingsIntentFactory(this, sessionManager.getCurrentUserId());
+            //startActivity(intent);
             return true;
 
         } else if (itemId == R.id.profileMenuItem) {
@@ -239,9 +311,10 @@ public class MainActivity extends AppCompatActivity {
      * launches addtaskactivity when admin clicks the button
      */
     private void setupAddTaskButton() {
-        // only setup if button actually exists (admin users)
-        if (binding.addTaskButton != null) {
-            binding.addTaskButton.setOnClickListener(new View.OnClickListener() {
+        // Find the add task button using findViewById instead of binding
+        Button addTaskButton = findViewById(R.id.addTaskButton);
+        if (addTaskButton != null) {
+            addTaskButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // launch addtaskactivity using intent factory
@@ -277,9 +350,13 @@ public class MainActivity extends AppCompatActivity {
             if (currentSession.isAdmin()) {
                 displayText += " (Admin)";
                 // Show admin-specific UI elements
-                binding.userHeader.setVisibility(View.VISIBLE);
-                binding.user1.setVisibility(View.VISIBLE);
-                binding.addTaskButton.setVisibility(View.VISIBLE);
+                TextView userHeader = findViewById(R.id.userHeader);
+                Button user1 = findViewById(R.id.user1);
+                Button addTaskButton = findViewById(R.id.addTaskButton);
+
+                if (userHeader != null) userHeader.setVisibility(View.VISIBLE);
+                if (user1 != null) user1.setVisibility(View.VISIBLE);
+                if (addTaskButton != null) addTaskButton.setVisibility(View.VISIBLE);
             }
             usernameDisplayTextView.setText(displayText);
             // Update options menu to reflect current user
@@ -312,6 +389,15 @@ public class MainActivity extends AppCompatActivity {
             Intent loginIntent = LoginActivity.loginIntentFactory(this);
             startActivity(loginIntent);
             finish();
+            return;
+        }
+
+        // Refresh task list when returning from other activities (like AddTaskActivity)
+        if (taskListViewModel != null) {
+            UserSession currentSession = sessionManager.getCurrentSession();
+            if (currentSession != null) {
+                taskListViewModel.loadTasksForUser(currentSession.getUserId());
+            }
         }
     }
 
@@ -354,10 +440,14 @@ public class MainActivity extends AppCompatActivity {
         String displayText = "Logged in as: " + userSession.getUsername();
         if (userSession.isAdmin()) {
             displayText += " (Admin)";
-            // Show admin-specific UI elements
-            if (binding.userHeader != null) binding.userHeader.setVisibility(View.VISIBLE);
-            if (binding.user1 != null) binding.user1.setVisibility(View.VISIBLE);
-            if (binding.addTaskButton != null) binding.addTaskButton.setVisibility(View.VISIBLE);
+            // Show admin-specific UI elements using findViewById
+            TextView userHeader = findViewById(R.id.userHeader);
+            Button user1 = findViewById(R.id.user1);
+            Button addTaskButton = findViewById(R.id.addTaskButton);
+
+            if (userHeader != null) userHeader.setVisibility(View.VISIBLE);
+            if (user1 != null) user1.setVisibility(View.VISIBLE);
+            if (addTaskButton != null) addTaskButton.setVisibility(View.VISIBLE);
         }
         usernameDisplayTextView.setText(displayText);
         invalidateOptionsMenu();
@@ -368,10 +458,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private void clearUserUI() {
         usernameDisplayTextView.setText("Not logged in");
-        // Hide admin-specific UI elements
-        if (binding.userHeader != null) binding.userHeader.setVisibility(View.GONE);
-        if (binding.user1 != null) binding.user1.setVisibility(View.GONE);
-        if (binding.addTaskButton != null) binding.addTaskButton.setVisibility(View.GONE);
+        // Hide admin-specific UI elements using findViewById
+        TextView userHeader = findViewById(R.id.userHeader);
+        Button user1 = findViewById(R.id.user1);
+        Button addTaskButton = findViewById(R.id.addTaskButton);
+
+        if (userHeader != null) userHeader.setVisibility(View.GONE);
+        if (user1 != null) user1.setVisibility(View.GONE);
+        if (addTaskButton != null) addTaskButton.setVisibility(View.GONE);
         invalidateOptionsMenu();
     }
 
