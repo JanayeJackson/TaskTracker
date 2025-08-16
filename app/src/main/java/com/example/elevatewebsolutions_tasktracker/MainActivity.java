@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize UI components
         initializeViews();
         setupLogoutButton();
+        setupAddTaskButton();
         displayCurrentUser();
 
         // Log current user info for debugging
@@ -170,6 +171,24 @@ public class MainActivity extends AppCompatActivity {
                 performLogout();
             }
         });
+    }
+
+    /**
+     * setup add task button click listener
+     * launches addtaskactivity when admin clicks the button
+     */
+    private void setupAddTaskButton() {
+        // only setup if button actually exists (admin users)
+        if (binding.addTaskButton != null) {
+            binding.addTaskButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // launch addtaskactivity using intent factory
+                    Intent addTaskIntent = AddTaskActivity.addTaskActivityIntentFactory(MainActivity.this);
+                    startActivity(addTaskIntent);
+                }
+            });
+        }
     }
 
     private void displayCurrentUser() {
