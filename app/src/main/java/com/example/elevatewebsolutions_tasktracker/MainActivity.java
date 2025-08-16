@@ -239,9 +239,10 @@ public class MainActivity extends AppCompatActivity {
      * launches addtaskactivity when admin clicks the button
      */
     private void setupAddTaskButton() {
-        // only setup if button actually exists (admin users)
-        if (binding.addTaskButton != null) {
-            binding.addTaskButton.setOnClickListener(new View.OnClickListener() {
+        // Find the add task button using findViewById instead of binding
+        Button addTaskButton = findViewById(R.id.addTaskButton);
+        if (addTaskButton != null) {
+            addTaskButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // launch addtaskactivity using intent factory
@@ -277,9 +278,13 @@ public class MainActivity extends AppCompatActivity {
             if (currentSession.isAdmin()) {
                 displayText += " (Admin)";
                 // Show admin-specific UI elements
-                binding.userHeader.setVisibility(View.VISIBLE);
-                binding.user1.setVisibility(View.VISIBLE);
-                binding.addTaskButton.setVisibility(View.VISIBLE);
+                TextView userHeader = findViewById(R.id.userHeader);
+                Button user1 = findViewById(R.id.user1);
+                Button addTaskButton = findViewById(R.id.addTaskButton);
+
+                if (userHeader != null) userHeader.setVisibility(View.VISIBLE);
+                if (user1 != null) user1.setVisibility(View.VISIBLE);
+                if (addTaskButton != null) addTaskButton.setVisibility(View.VISIBLE);
             }
             usernameDisplayTextView.setText(displayText);
             // Update options menu to reflect current user
@@ -312,6 +317,15 @@ public class MainActivity extends AppCompatActivity {
             Intent loginIntent = LoginActivity.loginIntentFactory(this);
             startActivity(loginIntent);
             finish();
+            return;
+        }
+
+        // Refresh task list when returning from other activities (like AddTaskActivity)
+        if (taskListViewModel != null) {
+            UserSession currentSession = sessionManager.getCurrentSession();
+            if (currentSession != null) {
+                taskListViewModel.loadTasksForUser(currentSession.getUserId());
+            }
         }
     }
 
@@ -354,10 +368,14 @@ public class MainActivity extends AppCompatActivity {
         String displayText = "Logged in as: " + userSession.getUsername();
         if (userSession.isAdmin()) {
             displayText += " (Admin)";
-            // Show admin-specific UI elements
-            if (binding.userHeader != null) binding.userHeader.setVisibility(View.VISIBLE);
-            if (binding.user1 != null) binding.user1.setVisibility(View.VISIBLE);
-            if (binding.addTaskButton != null) binding.addTaskButton.setVisibility(View.VISIBLE);
+            // Show admin-specific UI elements using findViewById
+            TextView userHeader = findViewById(R.id.userHeader);
+            Button user1 = findViewById(R.id.user1);
+            Button addTaskButton = findViewById(R.id.addTaskButton);
+
+            if (userHeader != null) userHeader.setVisibility(View.VISIBLE);
+            if (user1 != null) user1.setVisibility(View.VISIBLE);
+            if (addTaskButton != null) addTaskButton.setVisibility(View.VISIBLE);
         }
         usernameDisplayTextView.setText(displayText);
         invalidateOptionsMenu();
@@ -368,10 +386,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private void clearUserUI() {
         usernameDisplayTextView.setText("Not logged in");
-        // Hide admin-specific UI elements
-        if (binding.userHeader != null) binding.userHeader.setVisibility(View.GONE);
-        if (binding.user1 != null) binding.user1.setVisibility(View.GONE);
-        if (binding.addTaskButton != null) binding.addTaskButton.setVisibility(View.GONE);
+        // Hide admin-specific UI elements using findViewById
+        TextView userHeader = findViewById(R.id.userHeader);
+        Button user1 = findViewById(R.id.user1);
+        Button addTaskButton = findViewById(R.id.addTaskButton);
+
+        if (userHeader != null) userHeader.setVisibility(View.GONE);
+        if (user1 != null) user1.setVisibility(View.GONE);
+        if (addTaskButton != null) addTaskButton.setVisibility(View.GONE);
         invalidateOptionsMenu();
     }
 

@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
@@ -18,13 +19,27 @@ import java.util.List;
 public class TaskListViewModel extends AndroidViewModel {
 
     private final TaskManagerRepository repository;
-    private final MutableLiveData<List<Task>> userTasks = new MutableLiveData<>();
+    private final MutableLiveData<Integer> currentUserId = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private int currentUserId = -1;
+
+    // LiveData that transforms based on current user ID
+    private final LiveData<List<Task>> userTasks;
 
     public TaskListViewModel(@NonNull Application application) {
         super(application);
         repository = TaskManagerRepository.getRepository(application);
+
+        // Set up transformation that automatically updates when currentUserId changes
+        userTasks = Transformations.switchMap(currentUserId, userId -> {
+            if (userId != null && userId != -1) {
+                return repository.getAllTasksByUserId(userId);
+            } else {
+                // Return empty LiveData for invalid user IDs
+                MutableLiveData<List<Task>> emptyTasks = new MutableLiveData<>();
+                emptyTasks.setValue(null);
+                return emptyTasks;
+            }
+        });
     }
 
     // getters for UI observation
@@ -38,34 +53,36 @@ public class TaskListViewModel extends AndroidViewModel {
 
     /**
      * Load tasks for specific user ID
-     * TODO: integrate with xavier's filtering logic when ready
+     * Now properly connects to database via repository
      */
     public void loadTasksForUser(int userId) {
-        if (userId != currentUserId) {
-            currentUserId = userId;
+        if (userId != getCurrentUserIdValue()) {
             isLoading.setValue(true);
-
-            // basic implementation - enhance with future implementation
-            // repository.getTasksForUser(userId).observe(...)
-
-            // TODO: update this with data... just show empty list for now
-            userTasks.setValue(null);
+            currentUserId.setValue(userId);
+            // The Transformations.switchMap above will handle the actual data loading
             isLoading.setValue(false);
         }
+    }
+
+    private int getCurrentUserIdValue() {
+        Integer userId = currentUserId.getValue();
+        return userId != null ? userId : -1;
     }
 
     /**
      * Refresh task list for current user
      */
     public void refreshTasks() {
-        if (currentUserId != -1) {
-            loadTasksForUser(currentUserId);
+        Integer userId = currentUserId.getValue();
+        if (userId != null && userId != -1) {
+            // Force refresh by setting the same user ID again
+            currentUserId.setValue(userId);
         }
     }
 
     /**
      * Create new task for specified user
-     * basic implementation for mvp - leaving room so xavier can enhance later
+     * Enhanced implementation that properly refreshes the task list
      */
     public void createTask(String title, String description, String status, int assignedUserId) {
         isLoading.setValue(true);
@@ -78,12 +95,10 @@ public class TaskListViewModel extends AndroidViewModel {
             try {
                 repository.insertTask(newTask);
 
-                // refresh task list for current user on main thread
-                if (assignedUserId == currentUserId) {
-                    loadTasksForUser(currentUserId);
-                }
-
+                // refresh task list on main thread after successful insert
+                // The LiveData will automatically update due to database changes
                 isLoading.postValue(false);
+
             } catch (Exception e) {
                 android.util.Log.e("TaskListViewModel", "Error creating task: " + e.getMessage());
                 isLoading.postValue(false);
