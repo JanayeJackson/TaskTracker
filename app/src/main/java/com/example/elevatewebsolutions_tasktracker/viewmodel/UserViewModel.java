@@ -1,5 +1,6 @@
 package com.example.elevatewebsolutions_tasktracker.viewmodel;
 
+
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -8,9 +9,12 @@ import androidx.lifecycle.LiveData;
 
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.models.LoginRequest;
-import com.example.elevatewebsolutions_tasktracker.auth.models.AuthenticationResult;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.auth.services.UserAuthenticationService;
+import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
+import com.example.elevatewebsolutions_tasktracker.database.entities.User;
+
+import java.util.List;
 
 /**
  * ViewModel for managing user authentication state and session management
@@ -20,6 +24,7 @@ public class UserViewModel extends AndroidViewModel {
     private static final String TAG = "UserViewModel";
 
     private final SessionManager sessionManager;
+    private TaskManagerRepository repository;
     private final UserAuthenticationService authenticationService;
 
     private final MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>(false);
@@ -46,6 +51,13 @@ public class UserViewModel extends AndroidViewModel {
 
     public LiveData<String> getErrorMessage() {
         return errorMessage;
+    }
+
+    public LiveData<List<User>> getUserList() {
+        repository = TaskManagerRepository.getRepository(getApplication());
+
+        assert repository != null;
+        return repository.getAllUsers();
     }
 
     /**

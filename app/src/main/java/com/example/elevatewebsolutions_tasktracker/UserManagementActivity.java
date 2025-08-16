@@ -16,6 +16,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.database.TaskManagerRepository;
 import com.example.elevatewebsolutions_tasktracker.database.entities.User;
@@ -30,7 +31,8 @@ public class UserManagementActivity extends AppCompatActivity {
     private String buttonTitle;
 
     private SessionManager sessionManager;
-    
+
+    private int userId = -1;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -38,7 +40,6 @@ public class UserManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityUserManagementBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        int userId = -1;
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -49,26 +50,27 @@ public class UserManagementActivity extends AppCompatActivity {
         }
 
         repository = TaskManagerRepository.getRepository(getApplication());
+        sessionManager = new SessionManager(this);
 
         if(userId != -1) {
             // If userId is provided, we are in update mode
             assert repository != null;
             //get user from the repository
-            User user = repository.getUserByUserId(userId).getValue();
-            assert user != null;
-            //update the UI with user details
-            binding.userNameEditText.setText(user.getUsername());
-            binding.passwordEditText.setText(user.getPassword());
-            binding.confirmPasswordEditText.setText(user.getPassword());
-            binding.usertitleEditText.setText(user.getTitle());
-            binding.adminSwitch.setChecked(user.getAdmin());
+            repository.getUserByUserId(userId).observe(this, user ->{
+                //update the UI with user details
+                binding.userNameEditText.setText(user.getUsername());
+                binding.passwordEditText.setText(user.getPassword());
+                binding.confirmPasswordEditText.setText(user.getPassword());
+                binding.usertitleEditText.setText(user.getTitle());
+                binding.adminSwitch.setChecked(user.getAdmin());
+            });
 
             // Set the button text and click listener for update
             binding.addUserButton.setText("Update User");
             binding.addUserButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    updateUser(user);
+                    updateUser(userId);
                 }
             });
             //set the button text and click listener for delete
@@ -76,7 +78,7 @@ public class UserManagementActivity extends AppCompatActivity {
             binding.deleteUserButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deleteUser(user);
+                    deleteUser(userId);
                 }
             });
         } else {
@@ -99,34 +101,39 @@ public class UserManagementActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Return to the main activity
-                Intent intent = SettingsActivity.settingsIntentFactory(UserManagementActivity.this,  sessionManager.getCurrentUserId());
-                startActivity(intent);
+                navigateToSettings();
             }
         });
     }
 
-    private void deleteUser(User user) {
-        //Display a confirmation dialog before deleting the user
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(UserManagementActivity.this);
-        final AlertDialog alertDialog = alertBuilder.create();
+    private void deleteUser(int userId) {
 
-        alertBuilder.setMessage("Delete user " + user.getUsername() + "?");
+        repository.getUserByUserId(userId).observe(this, user -> {
 
-        alertBuilder.setPositiveButton("Logout", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //Delete the user with the given userId
-                repository.deleteUser(user);
-            }
+            //Display a confirmation dialog before deleting the user
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(UserManagementActivity.this);
+            final AlertDialog alertDialog = alertBuilder.create();
+
+            alertBuilder.setMessage("Delete user " + user.getUsername() + "?");
+
+            alertBuilder.setPositiveButton("Delete?", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    //Delete the user with the given userId
+                    repository.deleteUser(user);
+                    toastMaker("User " + user.getUsername() + " deleted successfully.");
+                    navigateToSettings();
+                }
+            });
+            alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    alertDialog.dismiss();
+                }
+            });
+
+            alertBuilder.create().show();
         });
-        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertBuilder.create().show();
     }
 
     private void addUser() {
@@ -151,9 +158,10 @@ public class UserManagementActivity extends AppCompatActivity {
             // add the user to the database
             repository.insertUser(new User(username, password, title, isAdmin));
         }
+        navigateToSettings();
     }
 
-    private void updateUser(User user) {
+    private void updateUser(int userId) {
         // Get the input values from the EditText fields
         String username = binding.userNameEditText.getText().toString().trim();
         String title = binding.usertitleEditText.getText().toString().trim();
@@ -171,14 +179,22 @@ public class UserManagementActivity extends AppCompatActivity {
             binding.passwordEditText.setError("Password cannot be empty");
         } else {
             // Proceed with updating the user
-            toastMaker("Updating user: " + username);
+            //toastMaker("Updating user: " + username);
             // update the user in the database
-            assert user != null;
-            user.setUsername(username);
-            user.setPassword(password);
-            user.setTitle(title);
-            user.setAdmin(admin);
-            repository.updateUser(user);
+            repository.getUserByUserId(userId).observe(this, existingUser -> {
+                if (existingUser != null) {
+                    existingUser.setUsername(username);
+                    existingUser.setPassword(password);
+                    existingUser.setTitle(title);
+                    existingUser.setAdmin(admin);
+                    repository.updateUser(existingUser);
+                    toastMaker("Updating user: " + username);
+                } else {
+                    toastMaker("User not found for update");
+                }
+            });
+            // Return to the settings activity after updating
+            navigateToSettings();
         }
     }
 
@@ -186,9 +202,15 @@ public class UserManagementActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public static Intent userManagementIntentFactory(Context context, String buttonTitle) {
+    private void navigateToSettings() {
+        Intent intent = SettingsActivity.settingsIntentFactory(UserManagementActivity.this,  sessionManager.getCurrentUserId());
+        startActivity(intent);
+    }
+
+    public static Intent userManagementIntentFactory(Context context, String buttonTitle, int userId) {
         Intent intent = new Intent(context, UserManagementActivity.class);
         intent.putExtra("Button_Title", buttonTitle);
+        intent.putExtra("User_Id", userId);
         return intent;
     }
 }
