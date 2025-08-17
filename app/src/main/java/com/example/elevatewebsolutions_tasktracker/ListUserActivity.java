@@ -1,5 +1,6 @@
 package com.example.elevatewebsolutions_tasktracker;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -28,8 +29,8 @@ public class ListUserActivity extends AppCompatActivity {
 
     private SessionManager sessionManager;
 
-    public static Intent listUserIntentFactory(SettingsActivity settingsActivity) {
-        return new Intent(settingsActivity, ListUserActivity.class);
+    public static Intent listUserIntentFactory(Context context) {
+        return new Intent(context, ListUserActivity.class);
     }
 
     @Override

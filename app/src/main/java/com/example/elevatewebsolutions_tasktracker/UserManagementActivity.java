@@ -48,19 +48,12 @@ public class UserManagementActivity extends AppCompatActivity {
         repository = TaskManagerRepository.getRepository(getApplication());
         sessionManager = new SessionManager(this);
 
+
         if(userId != -1) {
             // If userId is provided, we are in update mode
             assert repository != null;
             //get user from the repository
-            repository.getUserByUserId(userId).observe(this, user ->{
-                //update the UI with user details
-                binding.userNameEditText.setText(user.getUsername());
-                binding.passwordEditText.setText(user.getPassword());
-                binding.confirmPasswordEditText.setText(user.getPassword());
-                binding.usertitleEditText.setText(user.getTitle());
-                binding.adminSwitch.setChecked(user.getAdmin());
-            });
-
+            updateDisplay();
             // Set the button text and click listener for update
             binding.addUserButton.setText("Update User");
             binding.addUserButton.setOnClickListener(new View.OnClickListener() {
@@ -112,19 +105,19 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void deleteUser(int userId) {
-        repository.getUserByUserId(userId).observe(this, user -> {
+
             //Display a confirmation dialog before deleting the user
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(UserManagementActivity.this);
             final AlertDialog alertDialog = alertBuilder.create();
 
-            alertBuilder.setMessage("Delete user " + user.getUsername() + "?");
+            alertBuilder.setMessage("Delete user ?");
 
             alertBuilder.setPositiveButton("Delete?", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     //Delete the user with the given userId
-                    repository.deleteUser(user);
-                    toastMaker("User " + user.getUsername() + " deleted successfully.");
+                    repository.deleteUserById(userId);
+                    toastMaker("User deleted successfully.");
                 }
             });
             alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -135,7 +128,6 @@ public class UserManagementActivity extends AppCompatActivity {
             });
 
             alertBuilder.create().show();
-        });
     }
 
     private void addUser() {
@@ -166,6 +158,20 @@ public class UserManagementActivity extends AppCompatActivity {
             repository.insertUser(new User(username, password, title, isAdmin));
         }
         navigateToSettings();
+    }
+
+    private void updateDisplay() {
+        repository.getUserByUserId(userId).observe(this, user ->{
+            if (user == null) {
+                navigateToSettings();
+            }
+            //update the UI with user details
+            binding.userNameEditText.setText(user.getUsername());
+            binding.passwordEditText.setText(user.getPassword());
+            binding.confirmPasswordEditText.setText(user.getPassword());
+            binding.usertitleEditText.setText(user.getTitle());
+            binding.adminSwitch.setChecked(user.getAdmin());
+        });
     }
 
     private void updateUser(int userId) {
