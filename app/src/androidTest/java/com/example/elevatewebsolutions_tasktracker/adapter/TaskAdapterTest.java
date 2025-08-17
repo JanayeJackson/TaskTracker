@@ -18,12 +18,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Unit tests for {@code TaskAdapter}.
+ * Unit tests for {@link TaskAdapter}.
  *
+ * <p>Verifies that data is correctly bound to the ViewHolder views and that
+ * row clicks notify the registered listener.
  */
 @RunWith(AndroidJUnit4.class)
 public class TaskAdapterTest {
@@ -34,21 +36,26 @@ public class TaskAdapterTest {
     @Before
     public void setUp() {
         context = ApplicationProvider.getApplicationContext();
+        // Use the factory method to create adapter without click listener
         adapter = TaskAdapter.create();
     }
 
     @Test
     public void bind_bindsTitleDescriptionAndStatus() {
-        Task t = new Task("Title A", "Desc A", "To Do", 1);
-        adapter.updateTasks(Arrays.asList(t));
+        // Arrange
+        Task t = new Task("Title A", "Desc A", "To Do", /*userId=*/ 1);
+        adapter.updateTasks(Collections.singletonList(t));
 
+        // Create holder and bind position 0
         FrameLayout parent = new FrameLayout(context);
-        RecyclerView.ViewHolder base = adapter.onCreateViewHolder(parent, 0);
+        RecyclerView.ViewHolder vh = adapter.onCreateViewHolder(parent, 0);
 
+        // Use unchecked cast since we know the actual type
         @SuppressWarnings("unchecked")
-        TaskAdapter.TaskViewHolder vh = (TaskAdapter.TaskViewHolder) base;
-        adapter.onBindViewHolder(vh, 0);
+        TaskAdapter.TaskViewHolder taskVh = (TaskAdapter.TaskViewHolder) vh;
+        adapter.onBindViewHolder(taskVh, 0);
 
+        // Assert bound text
         TextView title = vh.itemView.findViewById(R.id.taskTitleTextView);
         TextView desc = vh.itemView.findViewById(R.id.taskDescriptionTextView);
         TextView status = vh.itemView.findViewById(R.id.taskStatusTextView);
@@ -64,19 +71,22 @@ public class TaskAdapterTest {
 
     @Test
     public void click_notifiesListenerWithCorrectTask() {
+        Task t1 = new Task("Title 1", "Desc 1", "In Progress", 1);
+
+        // Create adapter with click listener using the atomic reference
         AtomicReference<Task> clicked = new AtomicReference<>(null);
         TaskAdapter.OnTaskClickListener listener = clicked::set;
         adapter = TaskAdapter.create(listener);
 
-        Task t1 = new Task("Title 1", "Desc 1", "In Progress", 1);
-        adapter.updateTasks(Arrays.asList(t1));
+        adapter.updateTasks(Collections.singletonList(t1));
 
         FrameLayout parent = new FrameLayout(context);
-        RecyclerView.ViewHolder base = adapter.onCreateViewHolder(parent, 0);
+        RecyclerView.ViewHolder vh = adapter.onCreateViewHolder(parent, 0);
 
+        // Use unchecked cast since we know the actual type
         @SuppressWarnings("unchecked")
-        TaskAdapter.TaskViewHolder vh = (TaskAdapter.TaskViewHolder) base;
-        adapter.onBindViewHolder(vh, 0);
+        TaskAdapter.TaskViewHolder taskVh = (TaskAdapter.TaskViewHolder) vh;
+        adapter.onBindViewHolder(taskVh, 0);
 
         vh.itemView.performClick();
 
