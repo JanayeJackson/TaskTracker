@@ -18,11 +18,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Unit tests for {@code TaskAdapter}.
  *
- * 
+ * <p>Includes binding and click callback tests.</p>
  */
 @RunWith(AndroidJUnit4.class)
 public class TaskAdapterTest {
@@ -55,7 +56,25 @@ public class TaskAdapterTest {
 
         assertEquals("Title A", title.getText().toString());
         assertEquals("Desc A", desc.getText().toString());
-        // If your row shows only the raw status, change expected to "To Do".
         assertEquals("Status: To Do", status.getText().toString());
+    }
+
+    @Test
+    public void click_notifiesListenerWithCorrectTask() {
+        AtomicReference<Task> clicked = new AtomicReference<>(null);
+        TaskAdapter.OnTaskClickListener listener = clicked::set;
+        adapter = TaskAdapter.create(listener);
+
+        Task t1 = new Task("Title 1", "Desc 1", "In Progress", 1);
+        adapter.updateTasks(Arrays.asList(t1));
+
+        FrameLayout parent = new FrameLayout(context);
+        TaskAdapter.TaskViewHolder vh = adapter.onCreateViewHolder(parent, 0);
+        adapter.onBindViewHolder(vh, 0);
+
+        vh.itemView.performClick();
+
+        assertNotNull("Click listener should be invoked", clicked.get());
+        assertEquals("Title 1", clicked.get().getTitle());
     }
 }
