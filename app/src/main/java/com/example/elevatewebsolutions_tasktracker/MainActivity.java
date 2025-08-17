@@ -112,6 +112,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize RecyclerView for task list
         initializeTaskList();
+
+        binding.user1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch UserManagementActivity to manage users
+                Intent intent = ListUserActivity.listUserIntentFactory(MainActivity.this);
+                startActivity(intent);
+            }
+        });
     }
 
     private void initializeViews() {
