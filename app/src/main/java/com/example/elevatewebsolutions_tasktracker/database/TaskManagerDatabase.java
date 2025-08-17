@@ -13,6 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.elevatewebsolutions_tasktracker.MainActivity;
 import com.example.elevatewebsolutions_tasktracker.database.entities.User;
 import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
+import com.example.elevatewebsolutions_tasktracker.database.entities.Comment;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,10 +26,7 @@ import java.util.concurrent.Executors;
 //Username: user
 //Password: user123
 
-
-
-// TODO: Add Comment entity when implemented
-@Database(entities = {User.class, Task.class}, version = 4, exportSchema = false)
+@Database(entities = {User.class, Task.class, Comment.class}, version = 5, exportSchema = false)
 public abstract class TaskManagerDatabase extends RoomDatabase {
 
     // Table names
@@ -45,8 +43,7 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
     // Abstract methods to get DAOs
     public abstract UserDAO userDAO();
     public abstract TaskDAO taskDAO();
-    // TODO: Add CommentDAO when Comment entity is implemented
-    // public abstract CommentDAO commentDAO();
+    public abstract CommentDAO commentDAO();
 
     //Number of threads repository will run on
     private static final int NUMBER_OF_THREADS = 4;
@@ -74,6 +71,26 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
         }
     };
 
+    // Migration from version 4 to 5 (adds Comment table)
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            // Create comment table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `" + COMMENT_TABLE + "` " +
+                    "(`commentId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`taskId` INTEGER NOT NULL, " +
+                    "`authorId` INTEGER NOT NULL, " +
+                    "`text` TEXT, " +
+                    "`timestamp` INTEGER NOT NULL, " +
+                    "FOREIGN KEY(`taskId`) REFERENCES `" + TASK_TABLE + "`(`taskId`) ON UPDATE NO ACTION ON DELETE CASCADE , " +
+                    "FOREIGN KEY(`authorId`) REFERENCES `" + USER_TABLE + "`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+
+            // Create indices for foreign keys
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_comment_table_taskId` ON `" + COMMENT_TABLE + "` (`taskId`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_comment_table_authorId` ON `" + COMMENT_TABLE + "` (`authorId`)");
+        }
+    };
+
     /**
      * Singleton pattern implementation for database access
      * @param context Application context
@@ -88,7 +105,7 @@ public abstract class TaskManagerDatabase extends RoomDatabase {
                             TaskManagerDatabase.class,
                             DATABASE_NAME
                     )
-                            .addMigrations(MIGRATION_1_2, MIGRATION_3_4)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_3_4, MIGRATION_4_5)
                             .fallbackToDestructiveMigration() // Allow destructive migration for version changes
                             .addCallback(addDefaultValues)
                             .build();
