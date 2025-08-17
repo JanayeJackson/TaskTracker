@@ -148,12 +148,14 @@ Use this section in your submission/video. Checked items are completed in this r
 - Menu system with role-based options
 
 ### Isaiah S
-**Commits**: 3 commits  
+**Commits**: 10 commits  
 **GitHub Username**: isaiah-S-44
-**Branches**: 2+ branches  
+**Branches**: 4+ branches  
 **Key Pull Requests**:
 - PR #34: AppDatabase Implementation - Database singleton pattern
-- RecyclerView Adapter and ViewHolder implementation
+- PR #53: RecyclerView Adapter and ViewHolder implementation
+- PR #67: TaskAdapterTest
+- PR #60: Recycler view navigation test
 
 **Major Contributions**:
 - RecyclerView Adapter and ViewHolder for task display
