@@ -106,7 +106,6 @@ public class UserManagementActivity extends AppCompatActivity {
 
     private void deleteUser(int userId) {
 
-        repository.getUserByUserId(userId).observe(this, user -> {
             //Display a confirmation dialog before deleting the user
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(UserManagementActivity.this);
             final AlertDialog alertDialog = alertBuilder.create();
@@ -117,7 +116,7 @@ public class UserManagementActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     //Delete the user with the given userId
-                    repository.deleteUser(user);
+                    repository.deleteUserById(userId);
                     toastMaker("User deleted successfully.");
                 }
             });
@@ -129,7 +128,6 @@ public class UserManagementActivity extends AppCompatActivity {
             });
 
             alertBuilder.create().show();
-        });
     }
 
     private void addUser() {

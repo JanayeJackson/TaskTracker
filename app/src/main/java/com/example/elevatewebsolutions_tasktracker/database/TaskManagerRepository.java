@@ -383,4 +383,13 @@ public class TaskManagerRepository {
             commentDAO.deleteCommentById(commentId);
         });
     }
+
+    public void deleteUserById(int userId) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            User user = userDao.getUserByUserIdSync(userId);
+            if (user != null) {
+                userDao.delete(user);
+            }
+        });
+    }
 }

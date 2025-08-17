@@ -41,9 +41,7 @@ public interface UserDAO {
     @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " WHERE username == :username")
     User getUserByUsernameSync(String username);
 
+
     @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " WHERE id == :userId")
     User getUserByUserIdSync(int userId);
-
-
-
 }
