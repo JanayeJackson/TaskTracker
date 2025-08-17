@@ -14,6 +14,7 @@ import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
 import com.example.elevatewebsolutions_tasktracker.auth.services.UserAuthenticationService;
 import com.example.elevatewebsolutions_tasktracker.database.entities.Task;
 import com.example.elevatewebsolutions_tasktracker.database.entities.User;
+import com.example.elevatewebsolutions_tasktracker.database.entities.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class TaskManagerRepository {
 
     private final TaskDAO taskDAO;
     private final UserDAO userDao;
+    private final CommentDAO commentDAO;
     private LiveData<List<Task>> alltasks;
 
     private static TaskManagerRepository repository;
@@ -44,6 +46,7 @@ public class TaskManagerRepository {
         TaskManagerDatabase db = TaskManagerDatabase.getDatabase(application);
         this.taskDAO = db.taskDAO();
         this.userDao = db.userDAO();
+        this.commentDAO = db.commentDAO();
         this.alltasks = this.taskDAO.getAllTasks();
 
         // Initialize authentication services
@@ -292,5 +295,92 @@ public class TaskManagerRepository {
      */
     public void shutdown() {
         AuthenticationServiceFactory.getInstance().shutdown();
+    }
+
+    // Comment-related methods
+
+    /**
+     * Inserts a comment into the comment database
+     * @param comment
+     */
+    public void insertComment(Comment comment) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            commentDAO.insert(comment);
+        });
+    }
+
+    /**
+     * Updates a comment in the comment database
+     * @param comment
+     */
+    public void updateComment(Comment comment) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            commentDAO.update(comment);
+        });
+    }
+
+    /**
+     * Deletes a comment from the comment database
+     * @param comment
+     */
+    public void deleteComment(Comment comment) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            commentDAO.delete(comment);
+        });
+    }
+
+    /**
+     * Gets all comments for a specific task
+     * @param taskId
+     * @return a LiveData list of comments for the task
+     */
+    public LiveData<List<Comment>> getCommentsByTaskId(int taskId) {
+        return commentDAO.getCommentsByTaskId(taskId);
+    }
+
+    /**
+     * Gets all comments by a specific author
+     * @param authorId
+     * @return a LiveData list of comments by the author
+     */
+    public LiveData<List<Comment>> getCommentsByAuthor(int authorId) {
+        return commentDAO.getCommentsByAuthor(authorId);
+    }
+
+    /**
+     * Gets all comments in the comment database
+     * @return a LiveData list of all comments
+     */
+    public LiveData<List<Comment>> getAllComments() {
+        return commentDAO.getAllComments();
+    }
+
+    /**
+     * Gets a specific comment by its ID
+     * @param commentId
+     * @return the comment with the specified ID
+     */
+    public Comment getCommentByCommentId(int commentId) {
+        return commentDAO.getCommentByCommentId(commentId);
+    }
+
+    /**
+     * Deletes all comments for a specific task
+     * @param taskId
+     */
+    public void deleteCommentsByTaskId(int taskId) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            commentDAO.deleteCommentsByTaskId(taskId);
+        });
+    }
+
+    /**
+     * Deletes a comment by its ID
+     * @param commentId
+     */
+    public void deleteCommentById(int commentId) {
+        TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
+            commentDAO.deleteCommentById(commentId);
+        });
     }
 }
