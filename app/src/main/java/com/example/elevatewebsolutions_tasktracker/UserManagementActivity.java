@@ -119,7 +119,6 @@ public class UserManagementActivity extends AppCompatActivity {
                     //Delete the user with the given userId
                     repository.deleteUser(user);
                     toastMaker("User deleted successfully.");
-                    navigateToSettings();
                 }
             });
             alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
