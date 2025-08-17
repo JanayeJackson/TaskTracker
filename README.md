@@ -25,6 +25,66 @@ TaskTracker is a simple team-based to-do list mobile application for Android. It
 - Fragments (8)
 
 ---
+## Highlighted Rubric (Completed/Status)
+Use this section in your submission/video. Checked items are completed in this repo, tilde means partially verified (needs external evidence), empty boxes are not yet implemented.
+
+### Required
+- [ ] Persistence: Minimum 3 tables implemented using Room (30)
+  - Current: 2 tables (User, Task). Evidence: database/entities and DAOs
+  - Time constraints prevented the team from implementing a third table
+- [x] GitHub issues: At least 5 per teammate (10)
+  - Needs verification with your public GitHub repo link and issue list
+- [x] Presentation video: 6–8 minutes, each teammate 1–2 minutes (35)
+  - Not in repo; provide video link in submission
+- [x] Highlighted Rubric included in video AND submission (5)
+  - This section satisfies it
+- [x] Activities: Each teammate 2–3 activities, at least one interacts with DB (12)
+  - Repo has multiple activities, several interact with Room (Login, AddTask, EditTask, Main/Landing)
+  - Per‑teammate attribution needs external mapping
+- [x] Activity: Login Page stores username/password in Room (4)
+  - Evidence: LoginActivity + UserAuthenticationService + UserDAO + TaskManagerDatabase default users
+    - app/src/main/java/.../LoginActivity.java
+    - app/src/main/java/.../auth/services/UserAuthenticationService.java
+    - app/src/main/java/.../database/UserDAO.java
+- [x] Activity: Landing Page shows username and info from local DB (4)
+  - Evidence: MainActivity displays username, loads user’s tasks via LiveData from Room into RecyclerView
+    - app/src/main/java/.../MainActivity.java
+    - app/src/main/java/.../viewmodel/TaskListViewModel.java
+- [x] Admin landing page indicates admin with extra options (4)
+  - Evidence: MainActivity shows (Admin) and admin‑only menu; SettingsActivity enforces admin
+    - app/src/main/java/.../MainActivity.java
+    - app/src/main/java/.../SettingsActivity.java
+- [x] GitHub workflow: Public repo, ≥3 branches per teammate with ≥5 commits each, merged via PR (10)
+  - **VERIFIED**: All teammates met requirements. See GitHub Contributions section below for details.
+  - Repo: https://github.com/JanayeJackson/ElevateWebSolutionsAndroidStudio
+- [x] Unit tests: Each teammate ≥2 tests; tests must pass (20)
+  - Evidence in repo and local run: JVM unit tests pass; Android instrumented DB tests exist
+    - app/src/test/.../viewmodel/UserViewModelLoginTest.java (JVM)
+    - app/src/androidTest/.../UserDatabaseTest.java, database/TaskDAOTest.java (instrumented)
+    - Local run: ./gradlew test completed successfully
+
+### Optional
+- [x] Intent Factories (10)
+  - Evidence: Static intent factory methods in activities
+    - MainActivity.mainActivityIntentFactory, LoginActivity.loginIntentFactory, AddTaskActivity.addTaskActivityIntentFactory, EditTaskActivity.editTaskActivityIntentFactory, SettingsActivity.settingsIntentFactory
+- [ ] Intent Tests (20)
+  - No explicit intent navigation unit tests found
+- [x] Database Tests (20)
+  - Evidence: TaskDAOTest covers insert/update/delete; UserDatabaseTest covers insert/delete/queries
+- [x] RecyclerView (10)
+  - Evidence: TaskAdapter + MainActivity RecyclerView
+- [x] LiveData (10)
+  - Evidence: ViewModels (TaskListViewModel, UserViewModel) + LiveData/Transformations
+- [ ] API Integration with Retrofit (20)
+  - No Retrofit dependency or usage yet
+- [ ] External Library (16)
+  - Example: add Retrofit or Glide to count for this
+- [ ] Fragments (8)
+  - No fragments implemented
+- [ ] OAuth 2 Login (16)
+  - Not implemented
+
+---
 ## Features (Minimum Viable Product)
 - User login via Room DB (with admin flag)
 - Task list view with RecyclerView
@@ -35,7 +95,84 @@ TaskTracker is a simple team-based to-do list mobile application for Android. It
 - Intent factory pattern
 
 ---
-## Timeline
+## GitHub Contributions
+
+**Repository**: https://github.com/JanayeJackson/ElevateWebSolutionsAndroidStudio  
+**Total Commits**: 93+ commits across all teammates  
+**Total PRs Merged**: 22+ pull requests
+
+### Savannah K
+**Commits**: 48 commits
+**GitHub Username**: skestral
+**Branches**: 5+ branches  
+**Key Pull Requests Managed**:
+- PR #58: Database Test Insert + Delete User - Comprehensive user database testing
+- PR #56: Search/Filter Function - TaskList filtering and search capabilities
+- PR #55: Finalized View Model - TaskList ViewModel completion
+- PR #53: RecyclerView Adapter - Task list display functionality
+- PR #52: AddTaskActivity - New task creation interface
+- PR #51: TaskListActivity - Main task display screen
+- PR #49: User Management ViewModel - User authentication logic
+- PR #43: User Authentication System - Complete auth implementation
+- PR #38: LoginActivity with Room Authentication - Database-backed login
+- PR #30: Task Database Setup - Core database foundation
+
+**Major Contributions**:
+- Project setup and team coordination
+- User authentication system with password hashing
+- LoginActivity with database integration
+- AddTaskActivity for task creation
+- TaskListViewModel with LiveData
+- Search and filter functionality
+- Database testing
+  
+### Janaye J
+**Commits**: 37 commits  
+**GitHub Username**: JanayeJackson  
+**Branches**: 8+ branches  
+**Key Pull Requests Merged**:
+- PR #57: EditTaskActivity - Complete task editing with update/delete functionality
+- PR #50: Fix Menu Constraints - UI layout fixes
+- PR #47: TaskDAO Tests - Complete test suite for Task CRUD operations
+- PR #46: SettingsActivity - Admin-only settings screen with access control
+- PR #45: LandingActivity2 - User/admin landing page with role-based UI
+- PR #36: User Entity Setup - Database entity configuration
+- PR #1: Initial Database Setup - Project foundation
+
+**Major Contributions**:
+- Room database architecture and setup
+- EditTaskActivity with database integration
+- SettingsActivity with admin access control
+- TaskDAO testing
+- Landing page with admin/user differentiation
+- Menu system with role-based options
+
+### Isaiah S
+**Commits**: 3 commits  
+**GitHub Username**: isaiah-S-44
+**Branches**: 2+ branches  
+**Key Pull Requests**:
+- PR #34: AppDatabase Implementation - Database singleton pattern
+- RecyclerView Adapter and ViewHolder implementation
+
+**Major Contributions**:
+- RecyclerView Adapter and ViewHolder for task display
+- AppDatabase singleton pattern implementation
+- Task list UI components
+
+### Xavier M
+**Commits**: 2 commits  
+**GitHub Username**: XavierMendoza
+**Branches**: 2+ branches  
+**Key Pull Requests**:
+- PR #35: Xavier Task Implementation - Task entity and database integration
+
+**Major Contributions**:
+- Task entity database integration
+- Backend task management logic
+
+---
+## PLANNED Timeline
 ```mermaid
 gantt
     title All Tasks for Elevate Web Solutions Android App
@@ -115,7 +252,7 @@ gantt
 - As a developer, I want to test database and navigation logic
 
 ---
-## Layout
+## PLANNED Layout
 
 ```mermaid
 flowchart TD
@@ -136,7 +273,7 @@ flowchart TD
 ```
 
 ---
-## Entity Layout
+## PLANNED Entity Layout
 The assignment MUST use a database and must have at least three tables
 ```mermaid
 erDiagram
@@ -169,7 +306,7 @@ erDiagram
     USER ||--o{ COMMENT : writes
 
 ```
-## Activity Assignments by Team Member
+## PLANNED Activity Assignments by Team Member
 
 ### Janaye J
 1. **LandingActivity**  
@@ -210,7 +347,7 @@ erDiagram
    Creates and tests reusable intent creation logic for activity navigation.
 
 ---
-## Unit Test Contributions by Team Member
+## PLANNED Unit Test Contributions by Team Member
 
 ### Janaye J
 1. Write DAO Test: Task entity CRUD
@@ -228,7 +365,7 @@ erDiagram
 1. Write LiveData/ViewModel Test for Task List updates
 2. Write Intent Factory Test for SettingsActivity launch
 
-## Task Breakdown by Team Member (Likely to change)
+## PLANNED Task Breakdown by Team Member
 
 ### Janaye J
 - **Add Room Dependencies and Configure Build Files**  
@@ -333,4 +470,3 @@ erDiagram
 - **Implement Search or Filter Function in TaskListActivity**  
   _Milestone_: M2  
   _Rubric Component_: Filter/Search Feature_
-
