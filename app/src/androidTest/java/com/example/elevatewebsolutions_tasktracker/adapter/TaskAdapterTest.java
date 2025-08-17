@@ -7,6 +7,7 @@ import android.content.Context;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -23,7 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Unit tests for {@code TaskAdapter}.
  *
- * <p>Includes binding and click callback tests.</p>
  */
 @RunWith(AndroidJUnit4.class)
 public class TaskAdapterTest {
@@ -43,7 +43,10 @@ public class TaskAdapterTest {
         adapter.updateTasks(Arrays.asList(t));
 
         FrameLayout parent = new FrameLayout(context);
-        TaskAdapter.TaskViewHolder vh = adapter.onCreateViewHolder(parent, 0);
+        RecyclerView.ViewHolder base = adapter.onCreateViewHolder(parent, 0);
+
+        @SuppressWarnings("unchecked")
+        TaskAdapter.TaskViewHolder vh = (TaskAdapter.TaskViewHolder) base;
         adapter.onBindViewHolder(vh, 0);
 
         TextView title = vh.itemView.findViewById(R.id.taskTitleTextView);
@@ -69,7 +72,10 @@ public class TaskAdapterTest {
         adapter.updateTasks(Arrays.asList(t1));
 
         FrameLayout parent = new FrameLayout(context);
-        TaskAdapter.TaskViewHolder vh = adapter.onCreateViewHolder(parent, 0);
+        RecyclerView.ViewHolder base = adapter.onCreateViewHolder(parent, 0);
+
+        @SuppressWarnings("unchecked")
+        TaskAdapter.TaskViewHolder vh = (TaskAdapter.TaskViewHolder) base;
         adapter.onBindViewHolder(vh, 0);
 
         vh.itemView.performClick();
