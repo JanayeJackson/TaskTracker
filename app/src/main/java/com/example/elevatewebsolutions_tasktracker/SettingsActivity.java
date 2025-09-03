@@ -40,6 +40,13 @@ public class SettingsActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         UserSession currentUserSession = sessionManager.getCurrentSession();
 
+        if(currentUserSession == null){
+            // No user session, redirect to main activity
+            toastMaker("You must be logged in to access settings.");
+            navigateToMainActivity();
+            return;
+        }
+
         // Check if user is an admin
         if (!currentUserSession.isAdmin()) {
             // User is not an admin, redirect to main activity
