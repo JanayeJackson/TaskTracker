@@ -41,4 +41,7 @@ public interface TaskDAO {
 
     @Query("SELECT * FROM " + TaskManagerDatabase.TASK_TABLE + " WHERE title LIKE :searchQuery OR description LIKE :searchQuery ORDER BY taskId ASC")
     LiveData<List<Task>> searchTasks(String searchQuery);
+
+    @Query("DELETE FROM " + TaskManagerDatabase.TASK_TABLE + " WHERE taskId = :taskId")
+    void deleteTaskById(int taskId);
 }

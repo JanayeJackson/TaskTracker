@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -15,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.elevatewebsolutions_tasktracker.auth.models.UserSession;
 import com.example.elevatewebsolutions_tasktracker.auth.services.SessionManager;
@@ -30,6 +34,9 @@ public class UserManagementActivity extends AppCompatActivity {
     private TaskManagerRepository repository;
 
     private SessionManager sessionManager;
+
+    private LiveData<User> userLiveData;
+    private Observer<User> userObserver;
 
     private int userId = -1;
 
@@ -64,11 +71,12 @@ public class UserManagementActivity extends AppCompatActivity {
             });
             //set the button text and click listener for delete
             binding.deleteUserButton.setVisibility(View.VISIBLE);
-            binding.deleteUserButton.setOnClickListener(new View.OnClickListener() {
-                @Override
+            binding.deleteUserButton.setOnClickListener(v -> {
+                /*@Override
                 public void onClick(View view) {
                     deleteUser(userId);
-                }
+                }*/
+                repository.deleteUserById(userId);
             });
         } else {
             // If no userId is provided, we are in add mode
@@ -105,29 +113,37 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void deleteUser(int userId) {
+        try{
+                //Display a confirmation dialog before deleting the user
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(UserManagementActivity.this);
 
-            //Display a confirmation dialog before deleting the user
-            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(UserManagementActivity.this);
-            final AlertDialog alertDialog = alertBuilder.create();
+                alertBuilder.setMessage("Delete user ?");
 
-            alertBuilder.setMessage("Delete user ?");
+                alertBuilder.setPositiveButton("Delete?", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Delete the user with the given userId
+                        repository.deleteUserById(userId);
 
-            alertBuilder.setPositiveButton("Delete?", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    //Delete the user with the given userId
-                    repository.deleteUserById(userId);
-                    toastMaker("User deleted successfully.");
-                }
-            });
-            alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    alertDialog.dismiss();
-                }
-            });
+                        runOnUiThread(() -> {
+                            toastMaker("User deleted successfully.");
+                            navigateToSettings();
+                            finish(); // close this activity
+                        });
+                    }
+                });
+                alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                alertBuilder.create().show();
 
-            alertBuilder.create().show();
+            } catch (Exception e) {
+                Log.e(TAG, "Error deleting user: " + e.getMessage());
+                toastMaker("Error deleting user: " + e.getMessage());
+            }
     }
 
     private void addUser() {
@@ -161,9 +177,19 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void updateDisplay() {
-        repository.getUserByUserId(userId).observe(this, user ->{
+        userLiveData = repository.getUserByUserId(userId);
+
+        userObserver = user -> {
+            if(isFinishing() || isDestroyed()) {
+                return;
+            }
+
             if (user == null) {
+                // The user was deleted (or doesn't exist). Stop observing and leave.
+                if (userLiveData != null) userLiveData.removeObserver(userObserver);
+                Toast.makeText(this, "User deleted", Toast.LENGTH_SHORT).show();
                 navigateToSettings();
+                return;
             }
             //update the UI with user details
             binding.userNameEditText.setText(user.getUsername());
@@ -171,7 +197,9 @@ public class UserManagementActivity extends AppCompatActivity {
             binding.confirmPasswordEditText.setText(user.getPassword());
             binding.usertitleEditText.setText(user.getTitle());
             binding.adminSwitch.setChecked(user.getAdmin());
-        });
+
+        };
+        userLiveData.observe(this, userObserver);
     }
 
     private void updateUser(int userId) {
@@ -194,13 +222,26 @@ public class UserManagementActivity extends AppCompatActivity {
             // Proceed with updating the user
             //toastMaker("Updating user: " + username);
             // update the user in the database
-            User user = new User(username, password, title, admin);
-            user.setId(userId);
-            repository.updateUser(user);
-            toastMaker("Updating user: " + username);
-            toastMaker("User not found for update");
-            // Return to the settings activity after updating
-            navigateToSettings();
+            repository.getUserByUserId(userId).observe(this, user -> {;
+                if (user != null) {
+                    Log.i(TAG, "User found for update: " + user.getUsername());
+                    user.setUsername(username);
+                    user.setTitle(title);
+                    user.setPassword(password);
+                    user.setAdmin(admin);
+                    repository.updateUser(user);
+                    toastMaker("Updating user: " + username);
+                    toastMaker("User not found for update");
+                    // Return to the settings activity after updating
+                    navigateToSettings();
+                } else {
+                    Log.w(TAG, "User not found for update with ID: " + userId);
+                    // Return to the settings activity after updating
+                    navigateToSettings();
+                }
+                repository.getUserByUserId(userId).removeObservers(UserManagementActivity.this);
+            });
+
         }
     }
 

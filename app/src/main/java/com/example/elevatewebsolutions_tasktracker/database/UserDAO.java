@@ -44,4 +44,7 @@ public interface UserDAO {
 
     @Query("SELECT * FROM " + TaskManagerDatabase.USER_TABLE + " WHERE id == :userId")
     User getUserByUserIdSync(int userId);
+
+    @Query ("DELETE FROM " + TaskManagerDatabase.USER_TABLE + " WHERE id = :userId")
+    void deleteUserById(int userId);
 }

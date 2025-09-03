@@ -179,6 +179,14 @@ public class TaskManagerRepository {
         databaseWriteExecutor.execute(() -> taskDAO.delete(task));
     }
 
+    /**
+     * Delete task by ID
+     */
+
+    public void deleteTaskById(int taskId) {
+        databaseWriteExecutor.execute(() -> taskDAO.deleteTaskById(taskId));
+    }
+
 
 
     /**
@@ -386,10 +394,7 @@ public class TaskManagerRepository {
 
     public void deleteUserById(int userId) {
         TaskManagerDatabase.databaseWriteExecutor.execute(() -> {
-            User user = userDao.getUserByUserIdSync(userId);
-            if (user != null) {
-                userDao.delete(user);
-            }
+                userDao.deleteUserById(userId);
         });
     }
 }

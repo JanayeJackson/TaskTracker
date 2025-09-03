@@ -66,17 +66,14 @@ public class EditTaskActivity extends AppCompatActivity {
             navigateToMainActivity();
         });
 
-        binding.deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                deleteTask(taskId);
-            }
+        binding.deleteButton.setOnClickListener(v -> {
+            repository.deleteTaskById(taskId);
         });
     }
 
     private void updateTask(int taskId) {
         // get form values
-        String title = binding.taskDescriptionEditText.getText().toString().trim();
+        String title = binding.taskTitleEditText.getText().toString().trim();
         String description = binding.taskDescriptionEditText.getText().toString().trim();
         String status = binding.taskStatusSpinner.getSelectedItem().toString();
 
