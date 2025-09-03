@@ -2,7 +2,9 @@
 
 ## Overview
 TaskTracker is a simple team-based to-do list mobile application for Android. It uses Room database for persistence, LiveData for UI updates, and includes basic authentication and admin features.
-
+This project was originally created as part of a team assignment for an Android development course.
+All commits after 09/03/2025 will be made by Janaye J as I want to build on this project for my portfolio.
+The original repository can be found here: https://github.com/JanayeJackson/ElevateWebSolutionsAndroidStudio
 ---
 ## Team Members
 - **Janaye J**
